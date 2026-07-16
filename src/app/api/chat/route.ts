@@ -54,6 +54,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }
 
+  /* el historial también es entrada del cliente — mismo filtro que el mensaje */
+  const history = body.conversationHistory.filter(
+    (t) => !looksLikeInjection(t.content)
+  )
+
   if (looksLikeInjection(body.message)) {
     return NextResponse.json({
       output:
@@ -77,7 +82,7 @@ export async function POST(req: NextRequest) {
         message: body.message,
         sessionId: body.sessionId,
         turnCount: body.turnCount,
-        conversationHistory: body.conversationHistory,
+        conversationHistory: history,
         pagePath: body.pagePath ?? '/',
         locale: 'es',
       }),

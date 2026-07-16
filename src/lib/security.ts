@@ -19,14 +19,21 @@ export function rateLimit(key: string, max: number, windowMs: number): boolean {
 }
 
 export function clientIp(req: NextRequest): string {
-  return (
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-    req.headers.get('x-real-ip') ??
-    'unknown'
-  )
+  /* el último hop del XFF lo escribe Traefik; los primeros los puede falsear el cliente */
+  const xff = req.headers.get('x-forwarded-for')
+  if (xff) {
+    const hops = xff.split(',').map((s) => s.trim()).filter(Boolean)
+    if (hops.length > 0) return hops[hops.length - 1]
+  }
+  return req.headers.get('x-real-ip') ?? 'unknown'
 }
 
 export function hasAllowedOrigin(req: NextRequest): boolean {
+  /* los navegadores mandan Sec-Fetch-Site; si viene y es cross-site, fuera */
+  const fetchSite = req.headers.get('sec-fetch-site')
+  if (fetchSite && fetchSite !== 'same-origin' && fetchSite !== 'none') {
+    return false
+  }
   const origin = req.headers.get('origin')
   if (!origin) return true
   const allowed = [
