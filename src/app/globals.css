@@ -1,0 +1,160 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * NectaCore / Abi design tokens — miel/ámbar sobre carbón.
+ * Dark es el tema por defecto; light es first-class vía [data-theme="light"].
+ * Regla de la casa: nunca hardcodear fg/bg en componentes — siempre tokens.
+ */
+
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, :root:not([data-theme="light"]), :root:not([data-theme="light"]) *));
+
+:root {
+  /* carbón */
+  --bg: oklch(0.1650 0.0080 75);
+  --surface: oklch(0.2050 0.0100 75);
+  --surface-raised: oklch(0.2450 0.0120 75);
+  --border: oklch(0.3050 0.0160 78);
+
+  /* crema */
+  --text: oklch(0.9500 0.0180 85);
+  --text-muted: oklch(0.7250 0.0200 80);
+
+  /* miel / ámbar */
+  --accent: oklch(0.7900 0.1550 75);
+  --accent-strong: oklch(0.8450 0.1650 80);
+  --accent-soft: oklch(0.7900 0.1550 75 / 12%);
+  --on-accent: oklch(0.2050 0.0300 75);
+
+  /* estados */
+  --success: oklch(0.7200 0.1300 130);
+  --warn: oklch(0.6800 0.1500 50);
+  --premium: oklch(0.6800 0.1100 290);
+
+  --radius: 0.75rem;
+}
+
+[data-theme="light"] {
+  --bg: oklch(0.9700 0.0120 85);
+  --surface: oklch(0.9920 0.0060 85);
+  --surface-raised: oklch(1 0 0);
+  --border: oklch(0.8800 0.0180 82);
+
+  --text: oklch(0.2250 0.0120 75);
+  --text-muted: oklch(0.4600 0.0180 75);
+
+  /* ámbar profundo para AA sobre claro */
+  --accent: oklch(0.5900 0.1300 70);
+  --accent-strong: oklch(0.5200 0.1250 65);
+  --accent-soft: oklch(0.5900 0.1300 70 / 12%);
+  --on-accent: oklch(0.9900 0.0100 85);
+
+  --success: oklch(0.5500 0.1200 135);
+  --warn: oklch(0.5600 0.1400 45);
+  --premium: oklch(0.5200 0.1200 290);
+}
+
+@theme inline {
+  /* tokens de la casa */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-success: var(--success);
+  --color-warn: var(--warn);
+  --color-premium: var(--premium);
+
+  /* mapa semántico shadcn → tokens de la casa */
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--text);
+  --color-popover: var(--surface-raised);
+  --color-popover-foreground: var(--text);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--on-accent);
+  --color-secondary: var(--surface-raised);
+  --color-secondary-foreground: var(--text);
+  --color-muted: var(--surface);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent-ui: var(--accent-soft);
+  --color-destructive: var(--warn);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--accent);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), var(--font-body), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-honey-pulse: honey-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes honey-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+@keyframes honey-fill {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+@layer base {
+  * { border-color: var(--border); }
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+  ::selection { background: var(--accent); color: var(--on-accent); }
+}
+
+@layer utilities {
+  /* patrón de panal sutil (hexágonos), coloreado por currentColor del token */
+  .honeycomb-bg {
+    background-image: url("data:image/svg+xml,%3Csvg width='56' height='97' viewBox='0 0 56 97' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23b98a2e' stroke-opacity='0.55' stroke-width='1'%3E%3Cpath d='M28 17 L52 31 L52 63 L28 77 L4 63 L4 31 Z'/%3E%3Cpath d='M28 77 L52 91 M28 77 L4 91 M28 17 L28 -3'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 56px 97px;
+  }
+  .honey-glow {
+    box-shadow: 0 0 40px -8px var(--accent-soft), 0 0 120px -24px var(--accent-soft);
+  }
+  .t-eyebrow {
+    font-size: 0.775rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}

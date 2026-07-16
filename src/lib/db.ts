@@ -1,0 +1,15 @@
+import postgres from 'postgres'
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __nectaSql: ReturnType<typeof postgres> | undefined
+}
+
+export function getSql() {
+  const url = process.env.NECTA_DATABASE_URL
+  if (!url) return null
+  if (!globalThis.__nectaSql) {
+    globalThis.__nectaSql = postgres(url, { max: 5, idle_timeout: 30 })
+  }
+  return globalThis.__nectaSql
+}

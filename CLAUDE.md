@@ -1,0 +1,87 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this repo is
+
+**Abi** — a product-led, self-serve builder of business assistant bots (free → premium →
+enterprise). The demo *is* the product *is* the sales funnel: a prospect "builds" their own bot
+in a guided wizard (the **Constructor**), while every decision actually maps to a 90%
+pre-built flow on the Agave Bot Suite platform.
+
+**Current state: docs only.** There is no application code, no build, no tests yet. The repo
+contains `docs/` (architecture, roadmap, security, UX, pricing) and `brand/` (Abi's brand
+system). Work here today means editing/extending those documents; keep them consistent with
+each other (they cross-reference heavily).
+
+## Non-negotiable invariants
+
+- **Brand independence**: Abi is an independent brand. Nothing public-facing (UI, copy, docs
+  meant for users) may reveal the engine is the Agave Bot Suite / Zernio. See `brand/identity.md`.
+- **User content is DATA, never INSTRUCTION**: users never write or edit system prompts.
+  `system_prompt_ref` always points to our per-vertical template; user input enters only as
+  sanitized RAG KB + bounded, validated `overrides`. All uploaded/dictated content passes
+  quarantine (`uploaded → quarantined → sanitized → approved | rejected`) before it can be
+  materialized. This is the prompt-injection defense line — architectural, not a filter.
+  Full layered defense in `docs/SECURITY.md`.
+- **`capabilities` and `limits` come from the plan, never the user**, enforced server-side.
+- Workspace conventions (from the parent `piratapunk/CLAUDE.md`): schema-per-project Supabase
+  (`abi` schema, nothing in `public`, no cross-schema FKs — the bridge to `agave_demo.*` is a
+  logical `bot_id` reference via `provisioning_jobs`, never a physical FK); secrets
+  `ABI_<SCOPE>_<NAME>` in the vault; Coolify deploys; one-line commits, no trailers.
+
+## Architecture (the big picture)
+
+Abi is a thin **experience layer** on top of the already-in-production Agave Bot Suite. The
+golden rule: **reuse the engine, build only what's new** (~70% of the engine already exists).
+
+```
+ABI (this repo, new)                      AGAVE BOT SUITE (reuse, in production)
+apps/web — Next.js App Router PWA         ingress edge (CF Worker + Durable Object)
+  home + central chat                     demo-brain (n8n: LLM persona, RAG, signals)
+  the Constructor (wizard)        ──bot_spec──▶  agave_demo.* (bots, config, kb, funnel)
+  test panel + bounded live tweaks        Zernio channel (WhatsApp/social/voice/ads)
+supabase schema `abi`                     CRM panel (standalone Next)
+```
+
+- **The `bot_spec` is the contract** between the two worlds (declarative, versioned JSON —
+  spec in `docs/ARCHITECTURE.md` §2). The Suite knows nothing about plans/UX; Abi knows
+  nothing about n8n nodes. Everything hangs off this contract — define/change it carefully.
+- **The Constructor** (`docs/DEMO-BUILDER-FLOW.md`) is a state machine that fills the
+  `bot_spec`: vertical → content ingestion (docs/text/voice STT) → objectives → tone →
+  late registration → build → test panel. Each decision *selects and parameterizes* an
+  existing pre-built flow; nothing is generated hot.
+- **Provisioning** (Abi → Suite) is an idempotent internal API keyed by
+  `builder_session_id`: validates the spec (plan limits + quarantine `approved`), upserts
+  into `agave_demo.*`, returns `bot_id`.
+- **Core `abi.*` tables**: `tenants`, `users`, `builder_sessions` (anonymous-first, claimed at
+  registration), `bot_specs`, `kb_sources`, `leads`, `plan_limits`, `provisioning_jobs`.
+  RLS by `tenant_id` everywhere; anonymous sessions use opaque tokens.
+- **UX psychology is load-bearing, not decoration**: endowed progress (the honeycomb progress
+  bar starts ~30%), IKEA effect (guided customization, user reviews/edits extracted content),
+  labor illusion (narrated 60–90s build). `docs/UX-PSYCHOLOGY.md` maps each to a screen;
+  open questions are A/B experiments listed in `docs/ROADMAP.md`.
+
+## When code starts
+
+Planned stack is the house PWA template: Turborepo + Next.js App Router + self-hosted
+Supabase + Coolify, cloned from `pwa-bjj-manager` / `pwa-senda-loyalty` (the
+`/scaffold-pwa-saas` skill replicates it). Known gotcha to carry over: expose the `abi`
+schema in `PGRST_DB_SCHEMAS`. LLM via the brain: Gemini `gemini-piratapunk` for reasoning,
+Ollama for embeddings only. Implementation order is in `docs/ROADMAP.md` (Fase 0 → `bot_spec`
+contract → wizard → quarantine → provisioning).
+
+## Doc map
+
+| File | Content |
+|---|---|
+| `docs/VISION.md` | Product on one page: what, for whom, the "aha", business model |
+| `docs/ARCHITECTURE.md` | Constructor, `bot_spec` contract, data model, Suite reuse |
+| `docs/DEMO-BUILDER-FLOW.md` | The wizard step-by-step + decision→flow tree (the heart) |
+| `docs/SECURITY.md` | Ingestion rails: 7-layer anti-injection, PII, quarantine, abuse limits |
+| `docs/UX-PSYCHOLOGY.md` | Psychology mechanics mapped to each screen |
+| `docs/PRICING-TIERS.md` | Free/Premium/Enterprise and conversion mechanics |
+| `docs/ROADMAP.md` | Phased implementation with reuse + effort per row |
+| `brand/` | Brand system: identity, personality, voice/copy, visual language (bee/honeycomb) |
+
+Docs and brand content are written in Spanish — keep new/edited content in Spanish to match.
