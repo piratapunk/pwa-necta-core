@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button'
 import { getAuthUserId } from '@/lib/auth/server'
 import { getSql } from '@/lib/db'
 
+import { ConnectWhatsAppButton } from './ConnectWhatsAppButton'
+
 export const dynamic = 'force-dynamic'
 
 /*
@@ -30,7 +32,13 @@ export default async function PanelConexiones({
   const userId = await getAuthUserId()
   const sql = getSql()
   const rows = await sql!`select abi.tenant_overview(${userId}::uuid, ${slug}) as o`
-  const o = rows[0]?.o as { ok: boolean; plan: string; subdomain: string }
+  const o = rows[0]?.o as {
+    ok: boolean
+    plan: string
+    subdomain: string
+    channel_status: string
+    channel_number: string | null
+  }
   if (!o?.ok) return null
 
   return (
@@ -66,7 +74,7 @@ export default async function PanelConexiones({
           </div>
         </div>
 
-        {/* WhatsApp — el gancho premium */}
+        {/* WhatsApp — conectado / conectar / candado según plan */}
         <div className="rounded-xl border border-accent/40 bg-surface p-5">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2.5">
@@ -75,20 +83,46 @@ export default async function PanelConexiones({
               </span>
               <div>
                 <p className="text-sm font-semibold">WhatsApp</p>
-                <Badge variant="premium" className="mt-0.5">Premium</Badge>
+                {o.channel_status === 'connected' ? (
+                  <Badge className="mt-0.5 bg-success text-on-accent">conectado</Badge>
+                ) : (
+                  <Badge variant="premium" className="mt-0.5">Premium</Badge>
+                )}
               </div>
             </div>
-            <Lock className="size-4 text-text-muted" />
+            {o.plan === 'free' && <Lock className="size-4 text-text-muted" />}
           </div>
-          <p className="mt-3 text-xs text-text-muted">
-            Conecta tu número de siempre en ~5 minutos: tu app sigue funcionando
-            igual — tu bot contesta y tú entras cuando quieras.
-          </p>
-          <div className="mt-4">
-            <Button size="sm" asChild>
-              <a href={`/panel/${slug}/plan`}>Conectar mi WhatsApp</a>
-            </Button>
-          </div>
+
+          {o.channel_status === 'connected' ? (
+            <>
+              <p className="mt-3 text-xs text-text-muted">
+                Tu asistente contesta en {o.channel_number ?? 'tu número'} — y tú
+                puedes entrar a la conversación desde tu app cuando quieras.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="mt-3 text-xs text-text-muted">
+                Conecta tu número de siempre en ~5 minutos, guiado por el flujo
+                oficial de WhatsApp. Tu app sigue funcionando igual — tu bot
+                contesta y tú entras cuando quieras.
+              </p>
+              <div className="mt-4">
+                {o.plan === 'free' ? (
+                  <Button size="sm" asChild>
+                    <a href={`/panel/${slug}/plan`}>Desbloquear con Premium</a>
+                  </Button>
+                ) : (
+                  <ConnectWhatsAppButton slug={slug} />
+                )}
+              </div>
+              {o.channel_status === 'error' && (
+                <p className="mt-2 text-xs text-warn">
+                  La última conexión no se completó — inténtalo de nuevo.
+                </p>
+              )}
+            </>
+          )}
         </div>
 
         {/* próximamente */}
