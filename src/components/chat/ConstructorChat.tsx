@@ -88,6 +88,8 @@ export function ConstructorChat() {
   const [stage, setStage] = useState<Stage>('inicio')
   const [tsToken, setTsToken] = useState<string | null>(null)
   const [tsVerified, setTsVerified] = useState(false)
+  /* overlay del reto: visible → fading (éxito, se desvanece) → hidden */
+  const [tsOverlay, setTsOverlay] = useState<'visible' | 'fading' | 'hidden'>('visible')
   const [claimEmail, setClaimEmail] = useState('')
   const [claimState, setClaimState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const sidRef = useRef('')
@@ -117,9 +119,14 @@ export function ConstructorChat() {
       retry: 'auto',
       'retry-interval': 4000,
       'refresh-expired': 'auto',
-      callback: (token) => setTsToken(token),
+      callback: (token) => {
+        setTsToken(token)
+        setTsOverlay('fading')
+        setTimeout(() => setTsOverlay('hidden'), 700)
+      },
       'error-callback': () => {
         setTsToken(null)
+        setTsOverlay('visible')
         /* reto atorado (red/extensión): reintentar en vez de morir */
         setTimeout(() => {
           try {
@@ -160,6 +167,7 @@ export function ConstructorChat() {
       if (res.status === 403 && data.error?.startsWith('turnstile')) {
         setTsVerified(false)
         setTsToken(null)
+        setTsOverlay('visible')
         tsRendered.current = false
         setTimeout(renderTurnstile, 100)
         setMessages((prev) => [
@@ -203,7 +211,7 @@ export function ConstructorChat() {
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border bg-surface">
+    <div className="relative flex flex-1 flex-col overflow-hidden rounded-2xl border bg-surface">
       {siteKey && (
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js"
@@ -310,9 +318,19 @@ export function ConstructorChat() {
         )}
       </div>
 
-      {!tsVerified && siteKey && (
-        <div className="flex justify-center border-t bg-bg/40 px-4 py-2">
-          <div ref={tsContainer} />
+      {!tsVerified && siteKey && tsOverlay !== 'hidden' && (
+        <div
+          className={cn(
+            'absolute inset-0 z-10 flex items-center justify-center bg-bg/70 backdrop-blur-[2px] transition-opacity duration-500',
+            tsOverlay === 'fading' && 'pointer-events-none opacity-0'
+          )}
+        >
+          <div className="flex flex-col items-center gap-3 rounded-2xl border bg-surface/95 px-6 py-5 shadow-xl">
+            <p className="text-sm text-text-muted">
+              Un segundo — confirmando que eres humano 🐝
+            </p>
+            <div ref={tsContainer} />
+          </div>
         </div>
       )}
 
