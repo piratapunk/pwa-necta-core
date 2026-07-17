@@ -8,6 +8,11 @@ import {
   looksLikeInjection,
   rateLimit,
 } from '@/lib/security'
+import {
+  isSessionVerified,
+  markSessionVerified,
+  verifyTurnstile,
+} from '@/lib/turnstile'
 
 /*
  * Proxy al agente del Constructor (serv-necta-constructor, Strands).
@@ -19,6 +24,7 @@ const constructorSchema = z
   .object({
     builderSessionId: z.uuid(),
     message: z.string().min(1).max(2000),
+    turnstileToken: z.string().max(3000).optional(),
     _h: z.string().max(0),
   })
   .strict()
@@ -46,6 +52,18 @@ export async function POST(req: NextRequest) {
   if (!rateLimit(`ctor-sid:${body.builderSessionId}`, 10, 60_000)) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }
+  /* primera vez por sesión: exige Turnstile (anti-bot del provisioning) */
+  if (!isSessionVerified(body.builderSessionId)) {
+    if (!body.turnstileToken) {
+      return NextResponse.json({ error: 'turnstile_required' }, { status: 403 })
+    }
+    const ok = await verifyTurnstile(body.turnstileToken, ip)
+    if (!ok) {
+      return NextResponse.json({ error: 'turnstile_failed' }, { status: 403 })
+    }
+    markSessionVerified(body.builderSessionId)
+  }
+
   if (looksLikeInjection(body.message)) {
     return NextResponse.json({
       output:
@@ -79,10 +97,14 @@ export async function POST(req: NextRequest) {
     const data = (await res.json()) as {
       output?: string
       provisioned?: { subdomain?: string } | null
+      stage?: string
+      turns?: number
     }
     return NextResponse.json({
       output: (typeof data.output === 'string' && data.output) || FALLBACK,
       provisioned: data.provisioned ?? null,
+      stage: data.stage ?? 'conversando',
+      turns: data.turns ?? 0,
     })
   } catch {
     return NextResponse.json({ output: FALLBACK })

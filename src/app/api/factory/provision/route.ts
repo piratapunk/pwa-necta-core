@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { getSql } from '@/lib/db'
 import { botSpecSchema } from '@/lib/factory/spec'
 import { clientIp, hasAllowedOrigin, rateLimit } from '@/lib/security'
+import { isSessionVerified, verifyTurnstile } from '@/lib/turnstile'
 
 /*
  * Materializa un bot_spec: schema propio + rol propio + subdominio, vía el
@@ -16,6 +17,7 @@ const provisionSchema = z
   .object({
     builderSessionId: z.uuid(),
     spec: botSpecSchema,
+    turnstileToken: z.string().max(3000).optional(),
     _h: z.string().max(0),
   })
   .strict()
@@ -34,6 +36,17 @@ export async function POST(req: NextRequest) {
     body = provisionSchema.parse(await req.json())
   } catch {
     return NextResponse.json({ error: 'bad_request' }, { status: 400 })
+  }
+
+  /* humano verificado: o la sesión ya pasó Turnstile en el constructor, o
+     trae token propio */
+  if (!isSessionVerified(body.builderSessionId)) {
+    const ok = body.turnstileToken
+      ? await verifyTurnstile(body.turnstileToken, ip)
+      : false
+    if (!ok) {
+      return NextResponse.json({ error: 'turnstile_required' }, { status: 403 })
+    }
   }
 
   const sql = getSql()

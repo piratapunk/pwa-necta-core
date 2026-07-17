@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import Script from 'next/script'
 import { ExternalLink, Send } from 'lucide-react'
 
 import { AbiBee } from '@/components/brand/AbiBee'
@@ -9,9 +10,36 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 type Msg = { id: string; role: 'user' | 'assistant'; content: string }
+type Stage = 'inicio' | 'conversando' | 'borrador' | 'construido'
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        el: string | HTMLElement,
+        opts: {
+          sitekey: string
+          callback: (token: string) => void
+          'error-callback'?: () => void
+          appearance?: string
+          theme?: string
+        }
+      ) => string
+      reset: (id?: string) => void
+    }
+  }
+}
 
 const GREETING =
   'Hola, soy Abi 🐝 En un ratito armamos tu asistente — y lo dejamos funcionando de verdad. ¿A qué se dedica tu negocio?'
+
+/* endowed progress: el panal nunca arranca vacío */
+const STAGE_CELLS: Record<Stage, number> = {
+  inicio: 2,
+  conversando: 3,
+  borrador: 5,
+  construido: 6,
+}
 
 function getBuilderSession(): string {
   const key = 'necta_builder_session'
@@ -27,14 +55,43 @@ function getBuilderSession(): string {
   }
 }
 
+function HoneycombProgress({ filled }: { filled: number }) {
+  return (
+    <svg viewBox="0 0 340 60" className="mx-auto w-full max-w-[260px]" aria-hidden>
+      {Array.from({ length: 6 }, (_, i) => {
+        const x = 20 + i * 52
+        const points = `${x},14 ${x + 22},2 ${x + 44},14 ${x + 44},40 ${x + 22},52 ${x},40`
+        return (
+          <polygon
+            key={i}
+            points={points}
+            fill={i < filled ? 'var(--accent)' : 'transparent'}
+            stroke="var(--accent)"
+            strokeOpacity={i < filled ? 1 : 0.35}
+            strokeWidth="2"
+            style={{ transition: 'fill 0.6s ease' }}
+          />
+        )
+      })}
+    </svg>
+  )
+}
+
 export function ConstructorChat() {
   const [messages, setMessages] = useState<Msg[]>([])
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
   const [botUrl, setBotUrl] = useState<string | null>(null)
+  const [stage, setStage] = useState<Stage>('inicio')
+  const [tsToken, setTsToken] = useState<string | null>(null)
+  const [tsVerified, setTsVerified] = useState(false)
   const sidRef = useRef('')
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const tsContainer = useRef<HTMLDivElement>(null)
+  const tsRendered = useRef(false)
+
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
   useEffect(() => {
     sidRef.current = getBuilderSession()
@@ -45,6 +102,17 @@ export function ConstructorChat() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
   }, [messages, busy])
+
+  const renderTurnstile = useCallback(() => {
+    if (tsRendered.current || !siteKey || !window.turnstile || !tsContainer.current) return
+    tsRendered.current = true
+    window.turnstile.render(tsContainer.current, {
+      sitekey: siteKey,
+      appearance: 'always',
+      callback: (token) => setTsToken(token),
+      'error-callback': () => setTsToken(null),
+    })
+  }, [siteKey])
 
   const send = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,24 +131,45 @@ export function ConstructorChat() {
         body: JSON.stringify({
           builderSessionId: sidRef.current,
           message: text,
+          ...(!tsVerified && tsToken ? { turnstileToken: tsToken } : {}),
           _h: '',
         }),
       })
       const data = (await res.json()) as {
         output?: string
+        error?: string
         provisioned?: { subdomain?: string } | null
+        stage?: Stage
       }
+      if (res.status === 403 && data.error?.startsWith('turnstile')) {
+        setTsVerified(false)
+        setTsToken(null)
+        tsRendered.current = false
+        setTimeout(renderTurnstile, 100)
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            role: 'assistant',
+            content:
+              'Antes de seguir, márcame la casilla de "soy humano" aquí abajo 🐝 y me lo vuelves a mandar.',
+          },
+        ])
+        return
+      }
+      setTsVerified(true)
       setMessages((prev) => [
         ...prev,
         {
           id: crypto.randomUUID(),
           role: 'assistant',
-          content:
-            data.output?.trim() || 'Se me atoró algo. ¿Me lo repites?',
+          content: data.output?.trim() || 'Se me atoró algo. ¿Me lo repites?',
         },
       ])
+      if (data.stage) setStage(data.stage)
       if (data.provisioned?.subdomain) {
         setBotUrl(`https://${data.provisioned.subdomain}`)
+        setStage('construido')
       }
     } catch {
       setMessages((prev) => [
@@ -99,16 +188,27 @@ export function ConstructorChat() {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border bg-surface">
-      <div className="flex items-center gap-2.5 border-b bg-bg/60 px-4 py-3">
-        <AbiBee className="size-9" />
-        <div>
-          <p className="font-display text-sm font-bold leading-tight">
-            Abi · el Constructor
-          </p>
-          <p className="text-xs text-text-muted">
-            {busy ? 'trabajando…' : 'armando tu asistente'}
-          </p>
+      {siteKey && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          strategy="afterInteractive"
+          onLoad={renderTurnstile}
+        />
+      )}
+
+      <div className="flex items-center justify-between gap-2.5 border-b bg-bg/60 px-4 py-3">
+        <div className="flex items-center gap-2.5">
+          <AbiBee className="size-9" />
+          <div>
+            <p className="font-display text-sm font-bold leading-tight">
+              Abi · el Constructor
+            </p>
+            <p className="text-xs text-text-muted">
+              {busy ? 'trabajando…' : 'armando tu asistente'}
+            </p>
+          </div>
         </div>
+        <HoneycombProgress filled={STAGE_CELLS[stage]} />
       </div>
 
       {botUrl && (
@@ -147,6 +247,12 @@ export function ConstructorChat() {
         )}
       </div>
 
+      {!tsVerified && siteKey && (
+        <div className="flex justify-center border-t bg-bg/40 px-4 py-2">
+          <div ref={tsContainer} />
+        </div>
+      )}
+
       <form onSubmit={send} className="flex items-center gap-2 border-t bg-bg/60 p-3">
         <Input
           ref={inputRef}
@@ -156,7 +262,12 @@ export function ConstructorChat() {
           maxLength={2000}
           aria-label="Mensaje para Abi"
         />
-        <Button type="submit" size="icon" aria-label="Enviar" disabled={!draft.trim() || busy}>
+        <Button
+          type="submit"
+          size="icon"
+          aria-label="Enviar"
+          disabled={!draft.trim() || busy || (!tsVerified && !!siteKey && !tsToken)}
+        >
           <Send className="size-4" />
         </Button>
       </form>

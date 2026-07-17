@@ -36,7 +36,7 @@ TONOS = {"cercano", "formal", "juvenil", "profesional", "divertido"}
 pool = ConnectionPool(DB_URL, min_size=1, max_size=8, open=True)
 app = FastAPI()
 
-SYSTEM_PROMPT = """Eres Abi 🐝, la abejita constructora de bots de NectaCore. Guías al dueño de un negocio para armar su asistente, en español mexicano cálido y directo: frases cortas, una idea a la vez, cero jerga técnica (nunca digas LLM, prompt, flujo, webhook, esquema, base de datos). Prohibido el relleno tipo "¡Claro!", "¡Excelente!", "¡Por supuesto!".
+SYSTEM_PROMPT = """Eres Abi 🐝, la abejita constructora de bots de NectaCore. Guías al dueño de un negocio para armar su asistente, en español mexicano cálido y directo: frases cortas, una idea a la vez, cero jerga técnica (nunca digas LLM, prompt, flujo, webhook, esquema, base de datos). PROHIBIDO iniciar respuestas con exclamaciones de relleno: "¡Claro!", "¡Claro que sí!", "¡Excelente!", "¡Por supuesto!", "¡Perfecto!", "¡Genial!". Entra directo al contenido (mal: "¡Perfecto! Ya guardé…"; bien: "Listo, ya guardé…").
 
 TU PROCESO (en orden, sin saltarte pasos):
 1. ENTIENDE EL NEGOCIO. Si no sabes a qué se dedica, pregúntalo. Una sola pregunta por mensaje.
@@ -66,8 +66,18 @@ class Session:
         self.lock = threading.Lock()
         self.last = time.time()
         self.provisioned: dict | None = None
+        self.draft_saved = False
+        self.turns = 0
         self.sid = sid
         self.agent = self._make_agent()
+
+    @property
+    def stage(self) -> str:
+        if self.provisioned:
+            return "construido"
+        if self.draft_saved:
+            return "borrador"
+        return "conversando" if self.turns > 0 else "inicio"
 
     def _make_agent(self) -> Agent:
         sid = self.sid
@@ -141,6 +151,7 @@ class Session:
                    returning id""",
                 sid, json.dumps(spec),
             )
+            session.draft_saved = True
             return (
                 f"Borrador guardado. Resumen: asistente '{spec['persona']['bot_name']}' "
                 f"para {nombre_negocio} (giro {vertical}), tono {tono_v}. "
@@ -248,10 +259,13 @@ async def chat(request: Request):
 
     try:
         output = await anyio.to_thread.run_sync(run)
+        sess.turns += 1
     except Exception:
         output = "Se me atoró algo aquí adentro. ¿Me lo repites?"
 
     return {
         "output": output.strip() or "¿Me lo repites? No te leí bien.",
         "provisioned": sess.provisioned,
+        "stage": sess.stage,
+        "turns": sess.turns,
     }
