@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Send } from 'lucide-react'
 
+import { Linkify } from '@/components/chat/Linkify'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -114,7 +115,7 @@ export function TenantChat({
                 : 'rounded-bl-sm bg-surface-raised text-text'
             )}
           >
-            {m.content}
+            <Linkify text={m.content} />
           </div>
         ))}
         {busy && (

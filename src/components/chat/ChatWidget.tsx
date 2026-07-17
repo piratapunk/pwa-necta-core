@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { MessageCircle, Send, X } from 'lucide-react'
 
 import { AbiBee } from '@/components/brand/AbiBee'
+import { Linkify } from '@/components/chat/Linkify'
 import { useChat } from '@/components/chat/ChatContext'
 import { useChatSession } from '@/components/chat/useChatSession'
 import { Button } from '@/components/ui/button'
@@ -80,7 +81,7 @@ export function ChatWidget() {
                     : 'rounded-bl-sm bg-surface-raised text-text'
                 )}
               >
-                {m.visible}
+                <Linkify text={m.visible} />
               </div>
             ))}
             {isThinking && (

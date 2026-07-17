@@ -39,6 +39,8 @@ export function hasAllowedOrigin(req: NextRequest): boolean {
   }
   const origin = req.headers.get('origin')
   if (!origin) return true
+  /* los bots de tenants viven en subdominios: su Origin también es válido */
+  if (/^https:\/\/([a-z0-9-]+\.)?nectacore\.com$/.test(origin)) return true
   const allowed = [
     process.env.NEXT_PUBLIC_SITE_URL,
     process.env.SITE_URL,

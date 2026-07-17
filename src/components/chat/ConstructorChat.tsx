@@ -5,6 +5,7 @@ import Script from 'next/script'
 import { ExternalLink, Send } from 'lucide-react'
 
 import { AbiBee } from '@/components/brand/AbiBee'
+import { Linkify } from '@/components/chat/Linkify'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -305,7 +306,7 @@ export function ConstructorChat() {
                 : 'rounded-bl-sm bg-surface-raised text-text'
             )}
           >
-            {m.content}
+            <Linkify text={m.content} />
           </div>
         ))}
         {busy && (
