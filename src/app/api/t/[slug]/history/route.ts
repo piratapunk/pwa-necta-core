@@ -33,8 +33,8 @@ export async function GET(
       ok: boolean
       messages: { role: string; content: string }[]
     }
-    /* la función regresa los últimos 40 en orden descendente interno; reordenar */
-    const msgs = r?.ok ? [...(r.messages ?? [])].reverse() : []
+    /* la función ya regresa los últimos 40 en orden cronológico */
+    const msgs = r?.ok ? (r.messages ?? []) : []
     return NextResponse.json({ messages: msgs })
   } catch {
     return NextResponse.json({ messages: [] })
