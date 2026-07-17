@@ -6,12 +6,13 @@ import { ExternalLink, Send } from 'lucide-react'
 
 import { AbiBee } from '@/components/brand/AbiBee'
 import { Linkify } from '@/components/chat/Linkify'
+import { PersonalityTuner } from '@/components/chat/PersonalityTuner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 type Msg = { id: string; role: 'user' | 'assistant'; content: string }
-type Stage = 'inicio' | 'conversando' | 'borrador' | 'construido'
+type Stage = 'inicio' | 'conversando' | 'borrador' | 'afinado' | 'construido'
 
 declare global {
   interface Window {
@@ -41,7 +42,8 @@ const GREETING =
 const STAGE_CELLS: Record<Stage, number> = {
   inicio: 2,
   conversando: 3,
-  borrador: 5,
+  borrador: 4,
+  afinado: 5,
   construido: 6,
 }
 
@@ -318,6 +320,24 @@ export function ConstructorChat() {
           </div>
         )}
       </div>
+
+      {stage === 'borrador' && (
+        <PersonalityTuner
+          builderSessionId={sidRef.current}
+          onDone={() => {
+            setStage('afinado')
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: crypto.randomUUID(),
+                role: 'assistant',
+                content:
+                  'Quedó con carácter propio ✨ Ya afiné cómo habla, qué persigue y qué hace cuando no sabe algo. ¿Le doy vida? Dime "constrúyelo" y lo pongo en línea.',
+              },
+            ])
+          }}
+        />
+      )}
 
       {!tsVerified && siteKey && tsOverlay !== 'hidden' && (
         <div

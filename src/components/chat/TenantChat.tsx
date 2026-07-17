@@ -13,10 +13,12 @@ type Msg = { id: string; role: 'user' | 'assistant'; content: string }
 function getSid(slug: string): string {
   const key = `necta_tenant_sid_${slug}`
   try {
-    let sid = sessionStorage.getItem(key)
+    /* localStorage: la sesión sobrevive al cierre del navegador — el bot
+       recuerda al visitante 1:1 */
+    let sid = localStorage.getItem(key)
     if (!sid) {
       sid = crypto.randomUUID()
-      sessionStorage.setItem(key, sid)
+      localStorage.setItem(key, sid)
     }
     return sid
   } catch {
@@ -42,6 +44,21 @@ export function TenantChat({
   useEffect(() => {
     sidRef.current = getSid(slug)
     setMessages([{ id: 'greeting', role: 'assistant', content: greeting }])
+    fetch(`/api/t/${slug}/history?sessionId=${sidRef.current}`)
+      .then((r) => r.json())
+      .then((data: { messages?: { role: 'user' | 'assistant'; content: string }[] }) => {
+        if (data.messages?.length) {
+          setMessages([
+            { id: 'greeting', role: 'assistant', content: greeting },
+            ...data.messages.map((m) => ({
+              id: crypto.randomUUID(),
+              role: m.role,
+              content: m.content,
+            })),
+          ])
+        }
+      })
+      .catch(() => {})
   }, [slug, greeting])
 
   useEffect(() => {
