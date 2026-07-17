@@ -50,6 +50,27 @@ Todo lo de premium + operación y humano en el loop.
 > passthrough Meta/Zernio sin markup + soporte). El modelo de Zernio (cuenta del cliente) evita
 > revender su billing. **No inventar cifras** — se cotizan con números reales (regla del workspace).
 
+## Límites técnicos por plan (fuente única: `abi.plan_limits`, enforced server-side)
+
+| | Free 🐝 | Premium ⭐ | Enterprise 🏢 |
+|---|---|---|---|
+| Mensajes / día | 50 | 1,000 | 10,000 |
+| KB en contexto (chars) | 20,000 | 200,000 | 1,000,000 |
+| Archivos subibles | 1 | 10 | 50 |
+| Tamaño por archivo (crudo) | 2 MB | 10 MB | 25 MB |
+| Texto extraído máx. (chars) | 20,000 | 200,000 | 1,000,000 |
+| RAG / embeddings (pgvector) | ❌ nunca | ✅ | ✅ |
+
+Reglas de diseño de estos límites:
+- **El free se queda en lo lite a propósito**: su KB completa cabe en el contexto del modelo
+  (20k chars) — jamás genera embeddings ni toca pgvector. Vectorizar cuesta cómputo y abre
+  superficie; es valor de pago.
+- **Doble candado anti-compresión**: se limita el archivo CRUDO (MB subidos) **y** el texto
+  EXTRAÍDO (chars). Un zip/docx/pdf pequeño puede expandirse a mucho texto (bomba de
+  descompresión) — el segundo límite corta la extracción aunque el archivo haya pasado el
+  primero. Ambos se validan server-side durante la cuarentena (`SECURITY.md`).
+- Cambiar un límite = un UPDATE a `abi.plan_limits`, no un deploy.
+
 ## La mecánica de conversión (cómo el free jala a premium)
 
 1. **Anchoring temprano:** en el Constructor, objetivos y tweaks premium se ven con 🔒. El usuario

@@ -48,6 +48,9 @@ n8n `necta-tenant-chat`                [HMAC verificado en Postgres]
 | `abi.tenant_log_message(slug, uuid, rol, texto)` | Postgres | escritura al schema del tenant, misma regla |
 | `abi.factory_slugify(nombre)` | Postgres | slugs únicos, transliterados, lista de reservados (www, api, admin, mcp, …) |
 | `abi.factory_verify_hmac(ts, body, sig)` | Postgres | verificación de firmas para n8n — el secreto no sale de la DB (revocada a `abi_app`) |
+| `abi.plan_limits` (tabla) | Postgres | **fuente única** de límites por plan (msgs/día, KB chars, archivos, MB crudos, chars extraídos, rag_enabled); `provision_tenant` la lee — cambiar un límite es un UPDATE, no un deploy |
+| `abi.claim_tenant(session, user_id)` | Postgres | liga los bots de una builder_session al usuario autenticado (GoTrue); idempotente; el user_id viene de la sesión verificada server-side |
+| `abi.user_tenants(user_id)` | Postgres | lista de bots del usuario para `/mis-bots` y el futuro panel |
 | Firma de canal | `src/lib/factory/hmac.ts` | header `x-abi-signature: t=<ts>,v1=<hmac>` |
 
 ## 3. Modelo de tokens y secretos (lo consultado en tahona, aplicado)

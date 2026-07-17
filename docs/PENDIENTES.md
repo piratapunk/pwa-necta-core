@@ -34,7 +34,7 @@
 | # | Pendiente | Detalle | Prioridad |
 |---|---|---|---|
 | P1 (resto) | Constructor: ingesta de documentos + voz | Subir menú/catálogo (pipeline de cuarentena de `SECURITY.md`) y dictado STT. El agente Strands ya es la base; falta la tool `ingerir_documento` + UI de upload. | Alta |
-| P2 | Registro/claim de cuenta | **Decidido**: Supabase Auth self-hosted (GoTrue ya sano, 65 usuarios), magic-link-first + Google OAuth, patrón Senda + contrato `abi.claim_tenant`. Ver evaluación. | Alta |
+| P2 | Registro/claim de cuenta | **✅ Implementado y probado E2E** (2026-07-17): GoTrue + magic link brandeado (`generate_link` + callback propio, sin tocar config compartida) + `abi.tenant_users`/`claim_tenant`/`user_tenants` + página `/mis-bots` + captura de email post-provisión en el Constructor. `abi.plan_limits` creada como fuente única (incluye límites de archivos con doble candado anti-compresión; RAG jamás en free). **Faltan 2 pasos manuales**: (a) crear cuenta Resend de NectaCore y poner `ABI_RESEND_API_KEY`+`ABI_EMAIL_FROM` en vault/Coolify — los DNS del dominio los agrego yo por API en cuanto exista; (b) para Google OAuth: sumar nectacore.com a `GOTRUE_URI_ALLOW_LIST` + redirect en Google Console. | — |
 | P3 | Panel del dueño | Tweaks en vivo + ver conversaciones/leads de su schema. Depende de P2. | Media |
 | P4 | pgvector / RAG para KBs grandes | Umbral determinista (~15k chars o >1 doc) → chunking + embeddings Ollama + pgvector en el schema del tenant. No es agente (ver `STRANDS-EVALUATION.md` §2C). | Media |
 | P5 | Espejo `/en` | Copy nativo en inglés. | Baja |
