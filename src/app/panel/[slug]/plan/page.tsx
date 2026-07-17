@@ -1,10 +1,11 @@
 import { Check, Lock } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getAuthUserId } from '@/lib/auth/server'
 import { getSql } from '@/lib/db'
+
+import { PortalButton, UpgradeButtons } from './UpgradeButtons'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,6 +24,13 @@ export default async function PanelPlan({
     limits: Record<string, number | boolean | string>
   }
   if (!o?.ok) return null
+
+  const subRows = await sql!`
+    select subscription_status from abi.tenants where slug = ${slug}
+  `
+  const subStatus = (subRows[0]?.subscription_status as string) ?? 'none'
+  const monthly = process.env.ABI_PREMIUM_MONTHLY_MXN ?? '999'
+  const yearly = process.env.ABI_PREMIUM_YEARLY_MXN ?? '9990'
 
   const limitRows = await sql!`
     select plan, msgs_day, files_max, file_max_mb, rag_enabled
@@ -84,7 +92,7 @@ export default async function PanelPlan({
             <CardTitle className="text-base">Ponlo a trabajar de verdad ⭐</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2 text-sm text-text-muted">
+            <ul className="mb-5 space-y-2 text-sm text-text-muted">
               {[
                 'Tu número de WhatsApp real (conexión en ~5 min desde este panel)',
                 'Más mensajes, más memoria y documentos grandes',
@@ -95,13 +103,26 @@ export default async function PanelPlan({
                 </li>
               ))}
             </ul>
-            <Button className="mt-5" disabled>
-              Mejorar mi plan — muy pronto
-            </Button>
-            <p className="mt-2 text-xs text-text-muted">
-              Estamos terminando los pagos en línea. Si lo quieres ya, pídelo en
-              «Funciones a la medida» y te contactamos.
+            <UpgradeButtons slug={slug} monthly={monthly} yearly={yearly} />
+          </CardContent>
+        </Card>
+      )}
+
+      {o.plan !== 'free' && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="text-base">Tu suscripción</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4 text-sm text-text-muted">
+              Estado:{' '}
+              {subStatus === 'active'
+                ? 'activa ✅'
+                : subStatus === 'past_due'
+                  ? 'con pago pendiente — revisa tu método de pago'
+                  : subStatus}
             </p>
+            <PortalButton slug={slug} />
           </CardContent>
         </Card>
       )}
