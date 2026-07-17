@@ -29,12 +29,12 @@
 |---|---|---|---|
 | S3 | CF Full **strict** para `*.nectacore.com` | Requiere Origin CA Key de Cloudflare (no está en el vault; el API token no basta para emitir origin certs). Generar Origin Cert wildcard manualmente en el dash CF → instalarlo en Traefik → subir zona a Full (strict). | Media |
 
-## Producto (fases mayores — requieren decisiones de producto)
+## Producto (fases mayores — decisiones evaluadas con datos en [`EVALUACION-P2-F2.md`](EVALUACION-P2-F2.md))
 
 | # | Pendiente | Detalle | Prioridad |
 |---|---|---|---|
 | P1 (resto) | Constructor: ingesta de documentos + voz | Subir menú/catálogo (pipeline de cuarentena de `SECURITY.md`) y dictado STT. El agente Strands ya es la base; falta la tool `ingerir_documento` + UI de upload. | Alta |
-| P2 | Registro/claim de cuenta | Sesiones anónimas → claim por email/WhatsApp. Prerrequisito de panel y billing. Decidir: ¿Supabase Auth o magic links propios? | Alta |
+| P2 | Registro/claim de cuenta | **Decidido**: Supabase Auth self-hosted (GoTrue ya sano, 65 usuarios), magic-link-first + Google OAuth, patrón Senda + contrato `abi.claim_tenant`. Ver evaluación. | Alta |
 | P3 | Panel del dueño | Tweaks en vivo + ver conversaciones/leads de su schema. Depende de P2. | Media |
 | P4 | pgvector / RAG para KBs grandes | Umbral determinista (~15k chars o >1 doc) → chunking + embeddings Ollama + pgvector en el schema del tenant. No es agente (ver `STRANDS-EVALUATION.md` §2C). | Media |
 | P5 | Espejo `/en` | Copy nativo en inglés. | Baja |
