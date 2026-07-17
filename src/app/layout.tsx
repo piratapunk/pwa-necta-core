@@ -2,11 +2,6 @@ import type { Metadata, Viewport } from 'next'
 import { Baloo_2, Inter } from 'next/font/google'
 import Script from 'next/script'
 
-import { ChatProvider } from '@/components/chat/ChatContext'
-import { ChatWidget } from '@/components/chat/ChatWidget'
-import { Footer } from '@/components/layout/Footer'
-import { Navbar } from '@/components/layout/Navbar'
-
 import './globals.css'
 
 const display = Baloo_2({
@@ -63,12 +58,7 @@ export default function RootLayout({
         <Script id="theme-bootstrap" strategy="beforeInteractive">
           {themeBootstrap}
         </Script>
-        <ChatProvider>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-          <ChatWidget />
-        </ChatProvider>
+        {children}
       </body>
     </html>
   )
