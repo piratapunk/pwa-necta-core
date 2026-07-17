@@ -27,9 +27,9 @@ export function HeroSection() {
 
         <p className="mt-5 max-w-2xl animate-fade-up text-base text-text-muted [animation-delay:0.15s] sm:text-lg">
           Armas tu asistente con <strong className="text-text">Abi</strong> en
-          minutos: contesta esos WhatsApp que se te quedan en visto, agenda
-          citas y deja cada cliente registrado en tu CRM. Gratis para armar y
-          probar.
+          minutos y lo pruebas funcionando, gratis. Cuando quieras, lo conectas
+          a tu WhatsApp real para que conteste esos mensajes que se te quedan
+          en visto — y todo cae registrado en tu CRM.
         </p>
 
         <div className="mt-8 w-full animate-fade-up [animation-delay:0.2s]">

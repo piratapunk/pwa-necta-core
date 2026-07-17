@@ -14,9 +14,15 @@ import { Badge } from '@/components/ui/badge'
 const capabilities = [
   {
     icon: MessageCircle,
+    title: 'Chat de prueba al instante',
+    body: 'Armas tu asistente y lo pruebas funcionando en su propia página web, gratis.',
+    premium: false,
+  },
+  {
+    icon: MessageCircle,
     title: 'WhatsApp con tu número',
     body: 'Tu asistente contesta en tu WhatsApp real, a cualquier hora, con tu información.',
-    premium: false,
+    premium: true,
   },
   {
     icon: Send,
@@ -77,7 +83,7 @@ export function CapabilitiesSection() {
           </p>
         </div>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {capabilities.map((c) => (
             <div
               key={c.title}
