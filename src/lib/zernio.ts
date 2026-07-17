@@ -26,14 +26,18 @@ export async function createChannelProfile(name: string): Promise<string | null>
       signal: AbortSignal.timeout(15_000),
       body: JSON.stringify({ name: name.slice(0, 80) }),
     })
-    if (!res.ok) return null
+    if (!res.ok) {
+      console.error('[zernio] create profile status', res.status, (await res.text()).slice(0, 200))
+      return null
+    }
     const data = (await res.json()) as {
       profile?: { _id?: string; id?: string }
       _id?: string
       id?: string
     }
     return data.profile?._id ?? data.profile?.id ?? data._id ?? data.id ?? null
-  } catch {
+  } catch (err) {
+    console.error('[zernio] create profile error', err)
     return null
   }
 }
@@ -52,10 +56,14 @@ export async function getWhatsAppConnectUrl(
       headers,
       signal: AbortSignal.timeout(15_000),
     })
-    if (!res.ok) return null
+    if (!res.ok) {
+      console.error('[zernio] connect url status', res.status, (await res.text()).slice(0, 200))
+      return null
+    }
     const data = (await res.json()) as { authUrl?: string; url?: string }
     return data.authUrl ?? data.url ?? null
-  } catch {
+  } catch (err) {
+    console.error('[zernio] connect url error', err)
     return null
   }
 }

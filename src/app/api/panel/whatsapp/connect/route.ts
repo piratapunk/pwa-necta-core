@@ -67,6 +67,10 @@ export async function POST(req: NextRequest) {
     if (!profileId) {
       return NextResponse.json({ error: 'channel_error' }, { status: 502 })
     }
+    /* persistir de inmediato: un fallo posterior no debe huerfanear el perfil */
+    await sql`
+      select abi.set_tenant_channel(${tenantId}::uuid, 'connecting', ${profileId}, null, null)
+    `
   }
 
   const origin = await getAppOrigin()
