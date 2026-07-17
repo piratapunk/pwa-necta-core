@@ -27,8 +27,12 @@ export async function createChannelProfile(name: string): Promise<string | null>
       body: JSON.stringify({ name: name.slice(0, 80) }),
     })
     if (!res.ok) return null
-    const data = (await res.json()) as { _id?: string; id?: string }
-    return data._id ?? data.id ?? null
+    const data = (await res.json()) as {
+      profile?: { _id?: string; id?: string }
+      _id?: string
+      id?: string
+    }
+    return data.profile?._id ?? data.profile?.id ?? data._id ?? data.id ?? null
   } catch {
     return null
   }
