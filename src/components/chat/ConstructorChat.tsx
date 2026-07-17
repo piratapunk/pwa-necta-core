@@ -85,6 +85,8 @@ export function ConstructorChat() {
   const [stage, setStage] = useState<Stage>('inicio')
   const [tsToken, setTsToken] = useState<string | null>(null)
   const [tsVerified, setTsVerified] = useState(false)
+  const [claimEmail, setClaimEmail] = useState('')
+  const [claimState, setClaimState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const sidRef = useRef('')
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -212,15 +214,62 @@ export function ConstructorChat() {
       </div>
 
       {botUrl && (
-        <a
-          href={botUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 border-b bg-accent-soft px-4 py-2.5 text-sm font-semibold text-accent hover:underline"
-        >
-          Tu bot ya está en línea — pruébalo aquí
-          <ExternalLink className="size-4" />
-        </a>
+        <div className="border-b bg-accent-soft">
+          <a
+            href={botUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-accent hover:underline"
+          >
+            Tu bot ya está en línea — pruébalo aquí
+            <ExternalLink className="size-4" />
+          </a>
+          {claimState !== 'sent' ? (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault()
+                if (!claimEmail.trim() || claimState === 'sending') return
+                setClaimState('sending')
+                try {
+                  const res = await fetch('/api/auth/request-link', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      email: claimEmail.trim(),
+                      builderSessionId: sidRef.current,
+                      _h: '',
+                    }),
+                  })
+                  setClaimState(res.ok ? 'sent' : 'error')
+                } catch {
+                  setClaimState('error')
+                }
+              }}
+              className="flex items-center gap-2 px-4 pb-3"
+            >
+              <Input
+                type="email"
+                value={claimEmail}
+                onChange={(e) => setClaimEmail(e.target.value)}
+                placeholder="Tu correo — para que el bot quede a tu nombre"
+                aria-label="Correo para reclamar tu bot"
+                className="h-9 bg-surface text-xs"
+              />
+              <Button type="submit" size="sm" disabled={claimState === 'sending'}>
+                {claimState === 'sending' ? 'Enviando…' : 'Ligarlo a mí'}
+              </Button>
+            </form>
+          ) : (
+            <p className="px-4 pb-3 text-center text-xs text-text-muted">
+              Te mandé un enlace de acceso 🐝 revisa tu correo.
+            </p>
+          )}
+          {claimState === 'error' && (
+            <p className="px-4 pb-3 text-center text-xs text-warn">
+              No pude mandar el correo ahorita — tu bot sigue en línea; inténtalo más tarde.
+            </p>
+          )}
+        </div>
       )}
 
       <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
