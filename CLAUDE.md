@@ -13,9 +13,13 @@ pre-built flow on the Agave Bot Suite platform.
 (Tailwind v4 + shadcn, Spanish-only) for the NectaCore corporate landing: Abi promoted as the
 product, central chat wired `/api/chat` → n8n `necta-web-chat` → Gemini, persistence in the
 `abi` schema, deployed as Coolify app `necta-core-web`. Brand systems: `brand/` (Abi, the
-product/mascot) and `brand/nectacore/` (NectaCore, the corporate umbrella). The Constructor
-wizard and everything below is still to build; `docs/` remain the spec — keep them consistent
-with each other (they cross-reference heavily).
+product/mascot) and `brand/nectacore/` (NectaCore, the corporate umbrella). **The agentic
+factory is also live** (`docs/FACTORY-ARCHITECTURE.md`): intake LLM → `bot_spec` contract →
+`abi.provision_tenant` (real per-tenant schema `t_<slug>` + own DB role + encrypted creds) →
+instant `<slug>.nectacore.com` subdomain (CF wildcard + Traefik dynamic config + `src/proxy.ts`
+rewrite); channels between app and n8n are HMAC-signed (`x-abi-signature`), verified in
+Postgres. The Constructor UI wizard is still to build; `docs/` remain the spec — keep them
+consistent with each other (they cross-reference heavily).
 
 ## Non-negotiable invariants
 

@@ -59,6 +59,7 @@ una fila en `agave_demo.bots` + `bot_config` + KB + funnel. El resto (canal, bra
 | [`docs/SECURITY.md`](docs/SECURITY.md) | Rieles anti prompt-injection y de datos: sanitización de docs subidos, defensa por capas, PII |
 | [`docs/PRICING-TIERS.md`](docs/PRICING-TIERS.md) | Free / Premium / Enterprise: qué incluye cada uno y la mecánica de conversión |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Fases de implementación con evidencia de mercado + reuse de la plataforma + esfuerzo |
+| [`docs/FACTORY-ARCHITECTURE.md`](docs/FACTORY-ARCHITECTURE.md) | **El factory agéntico en producción**: intake LLM → contratos → schema/rol/subdominio por tenant, firmas HMAC |
 | [`brand/`](brand/README.md) | Sistema de marca de Abi: identidad, personalidad, voz, lenguaje visual y la mascota 🐝 |
 
 ## Convenciones (heredadas del workspace)
