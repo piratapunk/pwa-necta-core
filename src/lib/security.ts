@@ -19,7 +19,10 @@ export function rateLimit(key: string, max: number, windowMs: number): boolean {
 }
 
 export function clientIp(req: NextRequest): string {
-  /* el último hop del XFF lo escribe Traefik; los primeros los puede falsear el cliente */
+  /* subdominios entran por Cloudflare: CF-Connecting-IP es la IP real del
+     cliente; sin CF (apex DNS-only), el último hop del XFF lo escribe Traefik */
+  const cf = req.headers.get('cf-connecting-ip')
+  if (cf) return cf.trim()
   const xff = req.headers.get('x-forwarded-for')
   if (xff) {
     const hops = xff.split(',').map((s) => s.trim()).filter(Boolean)

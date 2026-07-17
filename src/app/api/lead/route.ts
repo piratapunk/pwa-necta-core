@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   if (!hasAllowedOrigin(req)) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   }
-  if (!rateLimit(`lead:${clientIp(req)}`, 5, 3_600_000)) {
+  if (!rateLimit(`lead:${clientIp(req)}`, 15, 3_600_000)) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }
 

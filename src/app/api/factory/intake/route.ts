@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   }
   const ip = clientIp(req)
-  if (!rateLimit(`intake:${ip}`, 10, 3_600_000)) {
+  if (!rateLimit(`intake:${ip}`, 40, 3_600_000)) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }
 

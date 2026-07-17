@@ -47,8 +47,8 @@ export async function POST(
   }
   const ip = clientIp(req)
   if (
-    !rateLimit(`tchat-ip:${ip}`, 20, 60_000) ||
-    !rateLimit(`tchat-hr:${ip}`, 120, 3_600_000)
+    !rateLimit(`tchat-ip:${ip}`, 60, 60_000) ||
+    !rateLimit(`tchat-hr:${ip}`, 600, 3_600_000)
   ) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }

@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
   }
   const ip = clientIp(req)
   if (
-    !rateLimit(`ctor-ip:${ip}`, 15, 60_000) ||
-    !rateLimit(`ctor-hr:${ip}`, 90, 3_600_000)
+    !rateLimit(`ctor-ip:${ip}`, 30, 60_000) ||
+    !rateLimit(`ctor-hr:${ip}`, 240, 3_600_000)
   ) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }

@@ -36,9 +36,11 @@ export async function POST(req: NextRequest) {
   }
 
   const ip = clientIp(req)
+  /* límites por IP holgados: en expos muchos visitantes comparten el WiFi;
+     el control fino es por sesión */
   if (
-    !rateLimit(`ip-min:${ip}`, 20, 60_000) ||
-    !rateLimit(`ip-hr:${ip}`, 80, 3_600_000)
+    !rateLimit(`ip-min:${ip}`, 60, 60_000) ||
+    !rateLimit(`ip-hr:${ip}`, 300, 3_600_000)
   ) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }
