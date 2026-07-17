@@ -19,9 +19,16 @@ Durable Object) → demo-brain (n8n) → panel CRM → canal Zernio. Ver `resh-z
 
 ## Estado
 
-🟡 **Planeación / branding** — este repo hoy contiene *solo documentación* (arquitectura,
-roadmap, seguridad, UX y sistema de marca). Sin código de app todavía. Ver `docs/ROADMAP.md`
-para la ruta de implementación por fases.
+🟢 **Landing en producción** — [nectacore.com](https://nectacore.com): la web corporativa de
+**NectaCore** (la marca-empresa; ver `brand/nectacore/`) promociona a Abi como su producto
+estrella, con el chat central conectado al brain (n8n `necta-web-chat` → Gemini) y persistencia
+en el schema `abi`. El Constructor (wizard) es la siguiente fase — ver `docs/ROADMAP.md`.
+
+**Stack actual**: Next.js 16 App Router + Tailwind v4 (tokens oklch, dark-first) + shadcn/ui,
+Docker standalone en Coolify (app `necta-core-web`). Rutas API: `/api/chat` (proxy con
+guardrails → webhook n8n) y `/api/lead` (rol `abi_app` → `abi.leads`). Env runtime:
+`ABI_DATABASE_URL`, `ABI_CHAT_N8N_WEBHOOK_URL`, `NEXT_PUBLIC_SITE_URL`, `SITE_URL`
+(vault: `secrets/necta.env`). Español-only por ahora; el espejo `/en` queda para después.
 
 ## Arquitectura (resumen)
 

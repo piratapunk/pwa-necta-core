@@ -9,10 +9,13 @@ enterprise). The demo *is* the product *is* the sales funnel: a prospect "builds
 in a guided wizard (the **Constructor**), while every decision actually maps to a 90%
 pre-built flow on the Agave Bot Suite platform.
 
-**Current state: docs only.** There is no application code, no build, no tests yet. The repo
-contains `docs/` (architecture, roadmap, security, UX, pricing) and `brand/` (Abi's brand
-system). Work here today means editing/extending those documents; keep them consistent with
-each other (they cross-reference heavily).
+**Current state: landing live at nectacore.com.** The repo now contains the Next.js 16 app
+(Tailwind v4 + shadcn, Spanish-only) for the NectaCore corporate landing: Abi promoted as the
+product, central chat wired `/api/chat` → n8n `necta-web-chat` → Gemini, persistence in the
+`abi` schema, deployed as Coolify app `necta-core-web`. Brand systems: `brand/` (Abi, the
+product/mascot) and `brand/nectacore/` (NectaCore, the corporate umbrella). The Constructor
+wizard and everything below is still to build; `docs/` remain the spec — keep them consistent
+with each other (they cross-reference heavily).
 
 ## Non-negotiable invariants
 
