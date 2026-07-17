@@ -41,8 +41,8 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Button className="hidden sm:inline-flex" onClick={() => openChat()}>
-            Arma tu asistente gratis
+          <Button className="hidden sm:inline-flex" asChild>
+            <Link href="/constructor">Arma tu asistente gratis</Link>
           </Button>
           <Button
             variant="ghost"
@@ -69,14 +69,10 @@ export function Navbar() {
                 {l.label}
               </a>
             ))}
-            <Button
-              className="mt-2 w-full"
-              onClick={() => {
-                setOpen(false)
-                openChat()
-              }}
-            >
-              Arma tu asistente gratis
+            <Button className="mt-2 w-full" asChild>
+              <Link href="/constructor" onClick={() => setOpen(false)}>
+                Arma tu asistente gratis
+              </Link>
             </Button>
           </div>
         </div>

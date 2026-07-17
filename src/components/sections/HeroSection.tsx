@@ -2,12 +2,9 @@
 
 import { AbiBee } from '@/components/brand/AbiBee'
 import { HeroChatInput } from '@/components/chat/HeroChatInput'
-import { useChat } from '@/components/chat/ChatContext'
 import { Button } from '@/components/ui/button'
 
 export function HeroSection() {
-  const { openChat } = useChat()
-
   return (
     <section className="relative overflow-hidden">
       <div className="honeycomb-bg absolute inset-0 opacity-[0.07]" aria-hidden />
@@ -40,8 +37,8 @@ export function HeroSection() {
         </div>
 
         <div className="mt-6 flex animate-fade-up flex-wrap items-center justify-center gap-3 [animation-delay:0.25s]">
-          <Button size="lg" onClick={() => openChat('Quiero armar mi asistente')}>
-            Arma tu asistente gratis
+          <Button size="lg" asChild>
+            <a href="/constructor">Arma tu asistente gratis</a>
           </Button>
           <Button size="lg" variant="secondary" asChild>
             <a href="#como-funciona">Ver cómo funciona</a>
