@@ -129,13 +129,28 @@ def run_refiner(spec: dict, prefs: dict) -> str | None:
         + f"INFORMACIÓN DEL NEGOCIO (para anticipar FAQs; será la fuente de datos en runtime):\n<<<\n{spec.get('knowledge_text', '')[:6000]}\n>>>"
     )
 
-    model = GeminiModel(
-        client_args={"api_key": GEMINI_KEY},
-        model_id=MODEL_ID,
-        params={"temperature": 0.4, "max_output_tokens": 1500},
+    # REST directo: el SDK async de Gemini dentro de un thread pelea con el
+    # event loop ("Event loop is closed") — una llamada síncrona simple no.
+    import urllib.request
+
+    req_body = json.dumps({
+        "system_instruction": {"parts": [{"text": REFINER_SYSTEM}]},
+        "contents": [{"role": "user", "parts": [{"text": entrada}]}],
+        "generationConfig": {"temperature": 0.4, "maxOutputTokens": 1500},
+    }).encode()
+    req = urllib.request.Request(
+        f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL_ID}:generateContent?key={GEMINI_KEY}",
+        data=req_body,
+        headers={"Content-Type": "application/json"},
+        method="POST",
     )
-    refiner = Agent(model=model, system_prompt=REFINER_SYSTEM, tools=[])
-    out = str(refiner(entrada)).strip()
+    try:
+        with urllib.request.urlopen(req, timeout=45) as resp:
+            data = json.loads(resp.read())
+        out = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+    except Exception as err:
+        print(f"[refiner] error: {err}", flush=True)
+        return None
     return out if len(out) > 200 else None
 
 
