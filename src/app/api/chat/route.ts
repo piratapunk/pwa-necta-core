@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  const webhookUrl = process.env.NECTA_CHAT_N8N_WEBHOOK_URL
+  const webhookUrl = process.env.ABI_CHAT_N8N_WEBHOOK_URL
   if (!webhookUrl) {
     return NextResponse.json({ output: FALLBACK }, { status: 200 })
   }

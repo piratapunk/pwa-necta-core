@@ -6,7 +6,7 @@ declare global {
 }
 
 export function getSql() {
-  const url = process.env.NECTA_DATABASE_URL
+  const url = process.env.ABI_DATABASE_URL
   if (!url) return null
   if (!globalThis.__nectaSql) {
     globalThis.__nectaSql = postgres(url, { max: 5, idle_timeout: 30 })
