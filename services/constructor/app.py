@@ -136,7 +136,12 @@ def run_refiner(spec: dict, prefs: dict) -> str | None:
     req_body = json.dumps({
         "system_instruction": {"parts": [{"text": REFINER_SYSTEM}]},
         "contents": [{"role": "user", "parts": [{"text": entrada}]}],
-        "generationConfig": {"temperature": 0.4, "maxOutputTokens": 1500},
+        "generationConfig": {
+            "temperature": 0.4,
+            "maxOutputTokens": 2000,
+            # tarea determinista: el thinking se come el presupuesto de salida
+            "thinkingConfig": {"thinkingBudget": 0},
+        },
     }).encode()
     req = urllib.request.Request(
         f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL_ID}:generateContent?key={GEMINI_KEY}",
@@ -155,7 +160,7 @@ def run_refiner(spec: dict, prefs: dict) -> str | None:
             print(f"[refiner] intento {intento} error: {err}", flush=True)
             if intento == 1:
                 time.sleep(18)  # 429 de cuota RPM: una espera suele bastar
-    return out if out and len(out) > 200 else None
+    return out if out and len(out) > 600 else None
 
 
 class Session:
