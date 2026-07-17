@@ -27,7 +27,12 @@ export async function createChannelProfile(name: string): Promise<string | null>
       body: JSON.stringify({ name: name.slice(0, 80) }),
     })
     if (!res.ok) {
-      console.error('[zernio] create profile status', res.status, (await res.text()).slice(0, 200))
+      const errText = (await res.text()).slice(0, 200)
+      /* nombre ya existente (reintento tras fallo previo): adoptar ese perfil */
+      if (res.status === 400 && errText.includes('already exists')) {
+        return findProfileByName(name)
+      }
+      console.error('[zernio] create profile status', res.status, errText)
       return null
     }
     const data = (await res.json()) as {
@@ -38,6 +43,27 @@ export async function createChannelProfile(name: string): Promise<string | null>
     return data.profile?._id ?? data.profile?.id ?? data._id ?? data.id ?? null
   } catch (err) {
     console.error('[zernio] create profile error', err)
+    return null
+  }
+}
+
+async function findProfileByName(name: string): Promise<string | null> {
+  const headers = authHeaders()
+  if (!headers) return null
+  try {
+    const res = await fetch(`${BASE}/profiles`, {
+      headers,
+      signal: AbortSignal.timeout(15_000),
+    })
+    if (!res.ok) return null
+    const data = (await res.json()) as {
+      profiles?: { _id?: string; name?: string }[]
+      data?: { _id?: string; name?: string }[]
+    }
+    const list = data.profiles ?? data.data ?? []
+    const hit = list.find((p) => p.name === name.slice(0, 80))
+    return hit?._id ?? null
+  } catch {
     return null
   }
 }
