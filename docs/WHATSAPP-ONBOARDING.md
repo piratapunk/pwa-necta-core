@@ -1,5 +1,16 @@
 # Onboarding de WhatsApp (Premium) — del proceso manual al self-serve
 
+> **Estado: IMPLEMENTADO (2026-07-17)** — el flujo del portal está en producción:
+> `/panel/[slug]/conexiones` → "Conectar mi WhatsApp" (gate Premium) → perfil por API
+> (idempotente: adopta perfil existente si el nombre ya está) → **Embedded Signup real de
+> Meta** (verificado E2E hasta la URL de OAuth con los 4 scopes) → callback firmado
+> (state HMAC) → `abi.set_tenant_channel`. El loop de mensajes también está vivo:
+> webhook `necta-wa-inbound` registrado en el canal (message.received, firmado) → n8n
+> verifica firma en Postgres → mapea accountId→tenant → brain con la KB del tenant →
+> responde vía inbox API → todo logueado en el schema del tenant (probado sintético;
+> lo único pendiente de validar con un número físico real es el tramo Meta→escaneo→primer
+> mensaje real). El diseño original de este doc se conserva abajo como referencia.
+
 > 2026-07-17. El proceso actual de conectar el WhatsApp de un cliente es artesanal.
 > Este doc lo mapea contra lo que la API del canal ya permite (catálogo:
 > `resh-zernio/capabilities/whatsapp-conexion-numeros.md`) y define el flujo objetivo
