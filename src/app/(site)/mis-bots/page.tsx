@@ -98,14 +98,17 @@ export default async function MisBotsPage() {
                   {t.status === 'active' ? 'en línea' : t.status}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex gap-2">
+                <Button size="sm" asChild>
+                  <Link href={`/panel/${t.slug}`}>Administrar</Link>
+                </Button>
                 <Button variant="secondary" size="sm" asChild>
                   <a
                     href={`https://${t.subdomain}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Abrir mi bot <ExternalLink className="size-3.5" />
+                    Abrir <ExternalLink className="size-3.5" />
                   </a>
                 </Button>
               </CardContent>
