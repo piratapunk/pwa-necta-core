@@ -49,12 +49,12 @@
 | O1 | Monitores Uptime Kuma | **Manual (2 min)** — no hay API/credenciales automatizables (el MCP vps-ops solo lee y le falta config). En Kuma agregar 4 monitores HTTP: `https://nectacore.com`, `https://nectacore.com/constructor`, `https://taqueria-la-nona.nectacore.com`, `https://necta-constructor.piratapunk.com/healthz` + notificación. | Alta (pre-Expo) |
 | O2 | Tenants demo | `taqueria-la-nona`, `estetica-bella-luna`, `patitas-felices` — se conservan como demos para la Expo. Borrar después con drop schema/role + delete en `abi.tenants`. | Baja |
 
-## Facturación (cuando P2 exista)
+## Facturación
 
 | # | Pendiente | Detalle |
 |---|---|---|
-| F1 | Pasarela self-serve premium | Stripe (stack de la casa). Precios con números reales. |
-| F2 | `upgrade_tenant` | Re-provision con más capabilities al subir de plan. |
+| F1 | Pasarela self-serve premium | **✅ En producción (2026-07-17, LIVE)**: cuenta Stripe NectaCore MX, producto Premium $999 MXN/mes y $9,990/año (2 meses gratis — cifras definidas por el dueño), checkout desde `/panel/[slug]/plan`, webhook firmado + idempotente (`abi.stripe_webhook_events`), portal de facturación. E2E verificado con eventos sintéticos firmados. **Pendiente F1-b**: prepago OXXO/SPEI de N meses (pago único) para PyMEs sin tarjeta. |
+| F2 | `upgrade_tenant` | **✅ En producción**: contrato SECURITY DEFINER que reescribe capabilities/limits desde `plan_limits` en el schema del tenant; upgrade y downgrade probados (el downgrade nunca borra el bot). Disparado por el webhook. |
 
 ## Checklist Expo (de `CAPACITY-EXPO.md`)
 
