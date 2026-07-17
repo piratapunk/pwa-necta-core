@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     const rows = await sql`
       select abi.provision_tenant(
         ${body.builderSessionId}::uuid,
-        ${JSON.stringify(body.spec)}::jsonb,
+        ${sql.json(body.spec)},
         ${masterKey}
       ) as result
     `
