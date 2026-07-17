@@ -144,14 +144,18 @@ def run_refiner(spec: dict, prefs: dict) -> str | None:
         headers={"Content-Type": "application/json"},
         method="POST",
     )
-    try:
-        with urllib.request.urlopen(req, timeout=45) as resp:
-            data = json.loads(resp.read())
-        out = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-    except Exception as err:
-        print(f"[refiner] error: {err}", flush=True)
-        return None
-    return out if len(out) > 200 else None
+    out = None
+    for intento in (1, 2):
+        try:
+            with urllib.request.urlopen(req, timeout=45) as resp:
+                data = json.loads(resp.read())
+            out = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+            break
+        except Exception as err:
+            print(f"[refiner] intento {intento} error: {err}", flush=True)
+            if intento == 1:
+                time.sleep(18)  # 429 de cuota RPM: una espera suele bastar
+    return out if out and len(out) > 200 else None
 
 
 class Session:
