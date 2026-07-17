@@ -23,6 +23,9 @@ declare global {
           'error-callback'?: () => void
           appearance?: string
           theme?: string
+          retry?: string
+          'retry-interval'?: number
+          'refresh-expired'?: string
         }
       ) => string
       reset: (id?: string) => void
@@ -111,8 +114,19 @@ export function ConstructorChat() {
     window.turnstile.render(tsContainer.current, {
       sitekey: siteKey,
       appearance: 'always',
+      retry: 'auto',
+      'retry-interval': 4000,
+      'refresh-expired': 'auto',
       callback: (token) => setTsToken(token),
-      'error-callback': () => setTsToken(null),
+      'error-callback': () => {
+        setTsToken(null)
+        /* reto atorado (red/extensión): reintentar en vez de morir */
+        setTimeout(() => {
+          try {
+            window.turnstile?.reset()
+          } catch {}
+        }, 4000)
+      },
     })
   }, [siteKey])
 
