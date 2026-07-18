@@ -41,6 +41,9 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
+          <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
+            <Link href="/entrar">Entrar</Link>
+          </Button>
           <Button className="hidden sm:inline-flex" asChild>
             <Link href="/constructor">Arma tu asistente gratis</Link>
           </Button>
@@ -72,6 +75,11 @@ export function Navbar() {
             <Button className="mt-2 w-full" asChild>
               <Link href="/constructor" onClick={() => setOpen(false)}>
                 Arma tu asistente gratis
+              </Link>
+            </Button>
+            <Button variant="secondary" className="w-full" asChild>
+              <Link href="/entrar" onClick={() => setOpen(false)}>
+                Entrar a mi cuenta
               </Link>
             </Button>
           </div>
