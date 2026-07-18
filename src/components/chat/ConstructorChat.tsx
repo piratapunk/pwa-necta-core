@@ -112,6 +112,20 @@ export function ConstructorChat() {
         return
       }
     } catch {}
+    /* sesiones que construyeron antes de esta versión: preguntar al servidor */
+    fetch(`/api/constructor/status?bs=${sidRef.current}`)
+      .then((r) => r.json())
+      .then((d: { built?: boolean; subdomain?: string }) => {
+        if (d.built && d.subdomain) {
+          const url = `https://${d.subdomain}`
+          setBotUrl(url)
+          setStage('construido')
+          try {
+            localStorage.setItem(`necta_built_${sidRef.current}`, url)
+          } catch {}
+        }
+      })
+      .catch(() => {})
     setMessages([{ id: 'greeting', role: 'assistant', content: GREETING }])
     inputRef.current?.focus()
   }, [])
