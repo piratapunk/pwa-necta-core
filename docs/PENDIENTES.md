@@ -56,7 +56,7 @@
 
 | # | Pendiente | Detalle | Prioridad |
 |---|---|---|---|
-| O1 | Monitores Uptime Kuma | **Manual (2 min)** — no hay API/credenciales automatizables (el MCP vps-ops solo lee y le falta config). En Kuma agregar 4 monitores HTTP: `https://nectacore.com`, `https://nectacore.com/constructor`, `https://taqueria-la-nona.nectacore.com`, `https://necta-constructor.piratapunk.com/healthz` + notificación. | Alta (pre-Expo) |
+| O1 | Monitores Uptime Kuma | **✅ (2026-07-18)**: 4 monitores HTTP dados de alta (NectaCore Web, Constructor, tenant demo taqueria-la-nona, servicio necta-constructor `/healthz`), todos Up, con la notificación Telegram "PirataPunk Infra Alerts" activa. | — |
 | O2 | Tenants demo | `taqueria-la-nona`, `estetica-bella-luna`, `patitas-felices` — se conservan como demos para la Expo. Borrar después con drop schema/role + delete en `abi.tenants`. | Baja |
 
 ## Facturación
