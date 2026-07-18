@@ -1,53 +1,49 @@
-'use client'
-
-import { AbiBee } from '@/components/brand/AbiBee'
-import { HeroChatInput } from '@/components/chat/HeroChatInput'
+import { AbiChatDemo } from '@/components/chat/AbiChatDemo'
 import { Button } from '@/components/ui/button'
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden">
-      <div className="honeycomb-bg absolute inset-0 opacity-[0.07]" aria-hidden />
+    <section className="relative overflow-hidden border-b">
+      <div className="honeycomb-bg absolute inset-0 opacity-[0.06]" aria-hidden />
       <div
-        className="absolute -top-40 left-1/2 size-[520px] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl"
+        className="absolute -top-40 -left-40 size-[560px] rounded-full bg-accent/10 blur-3xl"
         aria-hidden
       />
 
-      <div className="relative mx-auto flex max-w-4xl flex-col items-center px-4 pt-20 pb-24 text-center sm:px-6 sm:pt-28">
-        <AbiBee className="size-20 animate-fade-up sm:size-24" />
+      <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-2">
+        {/* izquierda: mensaje */}
+        <div className="animate-fade-up">
+          <p className="t-eyebrow">NectaCore · Honey-tech para tu negocio</p>
 
-        <p className="t-eyebrow mt-6 animate-fade-up [animation-delay:0.05s]">
-          NectaCore · La fábrica de asistentes
-        </p>
+          <h1 className="mt-4 text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
+            La fábrica de{' '}
+            <span className="text-accent">asistentes</span> para tu negocio
+          </h1>
 
-        <h1 className="mt-4 animate-fade-up text-4xl font-bold leading-[1.08] [animation-delay:0.1s] sm:text-6xl">
-          Tu negocio,{' '}
-          <span className="text-accent">contestando solo.</span>
-        </h1>
+          <p className="mt-5 max-w-lg text-base text-text-muted sm:text-lg">
+            Armas el tuyo con <strong className="text-text">Abi</strong> en
+            minutos, lo pruebas gratis, y cuando quieras lo conectas a tu
+            WhatsApp real.
+          </p>
 
-        <p className="mt-5 max-w-2xl animate-fade-up text-base text-text-muted [animation-delay:0.15s] sm:text-lg">
-          Armas tu asistente con <strong className="text-text">Abi</strong> en
-          minutos y lo pruebas funcionando, gratis. Cuando quieras, lo conectas
-          a tu WhatsApp real para que conteste esos mensajes que se te quedan
-          en visto — y todo cae registrado en tu CRM.
-        </p>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Button size="lg" asChild>
+              <a href="/constructor">Arma tu asistente gratis</a>
+            </Button>
+            <Button size="lg" variant="secondary" asChild>
+              <a href="#como-funciona">Ver cómo funciona</a>
+            </Button>
+          </div>
 
-        <div className="mt-8 w-full animate-fade-up [animation-delay:0.2s]">
-          <HeroChatInput />
+          <p className="mt-5 text-xs text-text-muted">
+            Sin código · Sin tarjeta · Lo pruebas antes de pagar
+          </p>
         </div>
 
-        <div className="mt-6 flex animate-fade-up flex-wrap items-center justify-center gap-3 [animation-delay:0.25s]">
-          <Button size="lg" asChild>
-            <a href="/constructor">Arma tu asistente gratis</a>
-          </Button>
-          <Button size="lg" variant="secondary" asChild>
-            <a href="#como-funciona">Ver cómo funciona</a>
-          </Button>
+        {/* derecha: demo viva de Abi */}
+        <div className="animate-fade-up [animation-delay:0.15s]">
+          <AbiChatDemo />
         </div>
-
-        <p className="mt-6 animate-fade-up text-xs text-text-muted [animation-delay:0.3s]">
-          Sin código · Sin tarjeta · Lo pruebas antes de pagar
-        </p>
       </div>
     </section>
   )

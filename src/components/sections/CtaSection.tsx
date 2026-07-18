@@ -6,7 +6,7 @@ export function CtaSection() {
     <section className="relative overflow-hidden border-t">
       <div className="honeycomb-bg absolute inset-0 opacity-[0.07]" aria-hidden />
       <div className="relative mx-auto flex max-w-3xl flex-col items-center px-4 py-20 text-center sm:px-6">
-        <AbiBee className="size-16" />
+        <AbiBee className="text-6xl" />
         <h2 className="mt-6 text-3xl font-bold sm:text-4xl">
           Tu próximo cliente ya te está escribiendo
         </h2>

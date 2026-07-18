@@ -45,7 +45,7 @@ export function BuildingOverlay({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
-      <AbiBee className="size-16 animate-honey-pulse" />
+      <AbiBee className="animate-honey-pulse text-6xl" />
       <p className="mt-5 font-display text-lg font-bold">
         Armando tu asistente…
       </p>

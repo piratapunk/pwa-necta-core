@@ -61,7 +61,7 @@ export function BuildSuccessCard({
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       {/* celebración + liga */}
       <div className="border-b bg-accent-soft px-6 py-6 text-center">
-        <AbiBee className="mx-auto size-14" />
+        <AbiBee className="mx-auto block text-5xl" />
         <h2 className="mt-3 font-display text-xl font-bold">
           ¡Tu asistente está vivo! 🎉
         </h2>

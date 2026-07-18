@@ -37,7 +37,7 @@ export default async function MisBotsPage() {
   if (!userId) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center sm:px-6">
-        <AbiBee className="mx-auto size-16" />
+        <AbiBee className="mx-auto block text-6xl" />
         <h1 className="mt-6 text-2xl font-bold">Aquí viven tus bots</h1>
         <p className="mt-3 text-sm text-text-muted">
           Cuando armes tu asistente, Abi te manda un enlace de acceso a tu

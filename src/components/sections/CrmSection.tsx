@@ -48,18 +48,23 @@ export function CrmSection() {
           </p>
           <ul className="mt-6 space-y-3 text-sm text-text-muted">
             <li className="flex gap-2.5">
-              <span className="text-accent">⬢</span>
+              <span className="text-accent">🍯</span>
               Leads con nombre y contacto, listos para darles seguimiento.
             </li>
             <li className="flex gap-2.5">
-              <span className="text-accent">⬢</span>
+              <span className="text-accent">🍯</span>
               Conversaciones completas por cliente, en un solo historial.
             </li>
             <li className="flex gap-2.5">
-              <span className="text-accent">⬢</span>
+              <span className="text-accent">🍯</span>
               Citas, tickets y ventas etiquetados solos, sin capturar nada a mano.
             </li>
           </ul>
+          <p className="mt-6 text-sm text-text-muted">
+            Y se conecta con lo tuyo:{' '}
+            <strong className="text-text">+400 integraciones</strong> con las
+            apps que ya usas — calendarios, hojas, pagos, tiendas en línea.
+          </p>
         </div>
       </div>
     </section>

@@ -253,7 +253,7 @@ export function ConstructorChat() {
 
       <div className="flex items-center justify-between gap-2.5 border-b bg-bg/60 px-4 py-3">
         <div className="flex items-center gap-2.5">
-          <AbiBee className="size-9" />
+          <AbiBee className="text-2xl" />
           <div>
             <p className="font-display text-sm font-bold leading-tight">
               Abi · el Constructor

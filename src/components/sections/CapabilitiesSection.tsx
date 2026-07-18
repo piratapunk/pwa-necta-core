@@ -1,67 +1,56 @@
-import {
-  BarChart3,
-  CalendarClock,
-  Megaphone,
-  MessageCircle,
-  Phone,
-  Send,
-  Star,
-  Target,
-} from 'lucide-react'
-
 import { Badge } from '@/components/ui/badge'
 
 const capabilities = [
   {
-    icon: MessageCircle,
+    emoji: '💬',
     title: 'Chat de prueba al instante',
     body: 'Armas tu asistente y lo pruebas funcionando en su propia página web, gratis.',
     premium: false,
   },
   {
-    icon: MessageCircle,
+    emoji: '📱',
     title: 'WhatsApp con tu número',
     body: 'Tu asistente contesta en tu WhatsApp real, a cualquier hora, con tu información.',
     premium: true,
   },
   {
-    icon: Send,
+    emoji: '📣',
     title: 'Redes sociales',
     body: 'DMs y comentarios de Instagram, Facebook y TikTok, atendidos al momento.',
     premium: true,
   },
   {
-    icon: Phone,
+    emoji: '📞',
     title: 'Teléfono con IA',
     body: 'Una recepcionista que contesta llamadas, agenda y transfiere cuando toca hablar contigo.',
     premium: true,
   },
   {
-    icon: CalendarClock,
+    emoji: '📅',
     title: 'Campañas y seguimientos',
     body: 'Recordatorios, promos y seguimientos por WhatsApp que salen solos, a tiempo.',
     premium: true,
   },
   {
-    icon: Star,
+    emoji: '⭐',
     title: 'Reseñas cuidadas',
     body: 'Tus reseñas de Google y Facebook, monitoreadas y respondidas — y una alerta si algo sale mal.',
     premium: true,
   },
   {
-    icon: Target,
+    emoji: '🎯',
     title: 'Anuncios que venden',
     body: 'Tus anuncios aterrizan directo en tu asistente. Sabes qué anuncio te trajo cada venta.',
     premium: true,
   },
   {
-    icon: Megaphone,
+    emoji: '📤',
     title: 'Contenido en todas tus redes',
     body: 'Publica desde un solo lugar, en tus horarios, adaptado a cada plataforma.',
     premium: true,
   },
   {
-    icon: BarChart3,
+    emoji: '📊',
     title: 'Reporte mensual',
     body: 'Un reporte con todo: mensajes, campañas, reseñas y resultados. Sin que lo pidas.',
     premium: true,
@@ -90,7 +79,9 @@ export function CapabilitiesSection() {
               className="group relative overflow-hidden rounded-xl border bg-surface p-5 transition-all hover:border-accent/50 hover:bg-accent-soft"
             >
               <div className="flex items-start justify-between">
-                <c.icon className="size-6 text-accent" />
+                <span className="text-2xl" aria-hidden>
+                  {c.emoji}
+                </span>
                 {c.premium && <Badge variant="premium">Premium</Badge>}
               </div>
               <h3 className="mt-4 font-semibold">{c.title}</h3>

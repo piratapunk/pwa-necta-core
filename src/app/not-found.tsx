@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 export default function NotFound() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center px-4 text-center">
-      <AbiBee className="size-20 opacity-70" />
+      <AbiBee className="text-7xl opacity-80" />
       <h1 className="mt-6 text-3xl font-bold">Aquí todavía no hay nada 🐝</h1>
       <p className="mt-3 max-w-md text-sm text-text-muted">
         Esta página no existe — o el asistente de esta dirección aún no se ha

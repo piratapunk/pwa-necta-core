@@ -54,7 +54,7 @@ export function LoginForm() {
   return (
     <div className="rounded-2xl border bg-surface p-8">
       <div className="text-center">
-        <AbiBee className="mx-auto size-14" />
+        <AbiBee className="mx-auto block text-5xl" />
         <h1 className="mt-4 text-2xl font-bold">Entra a tu cuenta</h1>
         <p className="mt-2 text-sm text-text-muted">
           Sin contraseñas. Te mandamos un enlace a tu correo y entras al instante.
