@@ -88,16 +88,28 @@ export function TenantChat({
         .filter((m) => m.id !== 'greeting')
         .slice(-10)
         .map((m) => ({ role: m.role, content: m.content }))
-      const res = await fetch(`/api/t/${slug}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: text,
-          sessionId: sidRef.current,
-          conversationHistory: history,
-          _h: '',
-        }),
+      const body = JSON.stringify({
+        message: text,
+        sessionId: sidRef.current,
+        conversationHistory: history,
+        _h: '',
       })
+      /* un reintento ante fallos transitorios (521 de deploy, WiFi de venue) */
+      let res: Response | null = null
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          res = await fetch(`/api/t/${slug}/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body,
+          })
+          if (res.ok) break
+        } catch {
+          res = null
+        }
+        if (attempt === 0) await new Promise((r) => setTimeout(r, 1500))
+      }
+      if (!res) throw new Error('network')
       const data = (await res.json()) as { output?: string }
       setMessages((prev) => [
         ...prev,
