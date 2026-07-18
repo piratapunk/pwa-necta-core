@@ -39,7 +39,10 @@ export const HUMAN_COOKIE = 'abi_hv'
 const HUMAN_TTL_S = 86_400
 
 function secret(): string {
-  return process.env.ABI_FACTORY_HMAC_SECRET ?? ''
+  const s = process.env.ABI_FACTORY_HMAC_SECRET
+  /* fail closed: sin secreto no hay firma válida posible */
+  if (!s || s.length < 32) throw new Error('ABI_FACTORY_HMAC_SECRET no configurado')
+  return s
 }
 
 export function makeHumanCookie(): string {
@@ -50,6 +53,14 @@ export function makeHumanCookie(): string {
 
 export function isHumanCookieValid(value: string | undefined): boolean {
   if (!value) return false
+  try {
+    return checkHumanCookie(value)
+  } catch {
+    return false
+  }
+}
+
+function checkHumanCookie(value: string): boolean {
   const m = /^(\d+)\.([0-9a-f]{64})$/.exec(value)
   if (!m) return false
   const ts = Number(m[1])
@@ -58,6 +69,7 @@ export function isHumanCookieValid(value: string | undefined): boolean {
   const got = Buffer.from(m[2], 'hex')
   return expected.length === got.length && timingSafeEqual(expected, got)
 }
+
 
 export const HUMAN_COOKIE_OPTS = {
   httpOnly: true,

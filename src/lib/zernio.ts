@@ -95,8 +95,14 @@ export async function getWhatsAppConnectUrl(
 }
 
 /* state firmado del redirect (anti-CSRF del callback) */
+function stateSecret(): string {
+  const s = process.env.ABI_FACTORY_HMAC_SECRET
+  if (!s || s.length < 32) throw new Error('ABI_FACTORY_HMAC_SECRET no configurado')
+  return s
+}
+
 export function signConnectState(slug: string): string {
-  const secret = process.env.ABI_FACTORY_HMAC_SECRET ?? ''
+  const secret = stateSecret()
   const ts = Math.floor(Date.now() / 1000)
   const payload = `${slug}.${ts}`
   const sig = createHmac('sha256', secret).update(payload).digest('hex')
@@ -104,7 +110,12 @@ export function signConnectState(slug: string): string {
 }
 
 export function verifyConnectState(state: string): string | null {
-  const secret = process.env.ABI_FACTORY_HMAC_SECRET ?? ''
+  let secret: string
+  try {
+    secret = stateSecret()
+  } catch {
+    return null
+  }
   const m = /^([a-z][a-z0-9-]{2,29})\.(\d+)\.([0-9a-f]{64})$/.exec(state)
   if (!m) return null
   const [, slug, ts, sig] = m
