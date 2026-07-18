@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Script from 'next/script'
-import { ExternalLink, Send } from 'lucide-react'
+import { ExternalLink, FileText, Paperclip, Send } from 'lucide-react'
 
 import { AbiBee } from '@/components/brand/AbiBee'
 import { Linkify } from '@/components/chat/Linkify'
@@ -15,6 +15,19 @@ import { cn } from '@/lib/utils'
 
 type Msg = { id: string; role: 'user' | 'assistant'; content: string }
 type Stage = 'inicio' | 'conversando' | 'borrador' | 'afinado' | 'construido'
+type Upload =
+  | { phase: 'uploading'; filename: string }
+  | { phase: 'review'; id: string; filename: string; chars: number; text: string }
+  | { phase: 'error'; msg: string }
+
+const UPLOAD_ERRORS: Record<string, string> = {
+  tipo_no_permitido: 'Ese tipo de archivo no lo puedo leer. Sube PDF, Word, TXT, Markdown o CSV.',
+  demasiado_grande: 'El archivo pesa más de lo que permite el plan gratis (2 MB).',
+  limite_archivos: 'El plan gratis incluye 1 archivo. Descarta el anterior si quieres cambiarlo.',
+  sin_texto: 'No encontré texto legible en ese archivo. ¿Tienes una versión con texto (no solo imágenes)?',
+  turnstile_required: 'Antes de subir archivos, márcame la casilla de "soy humano".',
+  rate_limited: 'Vas muy rápido — espera un momento e inténtalo de nuevo.',
+}
 
 declare global {
   interface Window {
@@ -94,6 +107,8 @@ export function ConstructorChat() {
   const [stage, setStage] = useState<Stage>('inicio')
   const [tsToken, setTsToken] = useState<string | null>(null)
   const [tsVerified, setTsVerified] = useState(false)
+  const [upload, setUpload] = useState<Upload | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   /* overlay del reto: visible → fading (éxito, se desvanece) → hidden */
   const [tsOverlay, setTsOverlay] = useState<'visible' | 'fading' | 'hidden'>('visible')
   const sidRef = useRef('')
@@ -163,6 +178,96 @@ export function ConstructorChat() {
       },
     })
   }, [siteKey])
+
+  const pickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || upload?.phase === 'uploading') return
+    setUpload({ phase: 'uploading', filename: file.name })
+    try {
+      const fd = new FormData()
+      fd.set('sessionId', sidRef.current)
+      fd.set('file', file)
+      const res = await fetch('/api/constructor/upload', { method: 'POST', body: fd })
+      const data = (await res.json()) as {
+        ok?: boolean
+        id?: string
+        filename?: string
+        chars?: number
+        text?: string
+        error?: string
+      }
+      if (!res.ok || !data.ok) {
+        setUpload({
+          phase: 'error',
+          msg: UPLOAD_ERRORS[data.error ?? ''] ?? 'No pude leer tu archivo. Inténtalo de nuevo.',
+        })
+        return
+      }
+      setUpload({
+        phase: 'review',
+        id: data.id!,
+        filename: data.filename ?? file.name,
+        chars: data.chars ?? 0,
+        text: data.text ?? '',
+      })
+    } catch {
+      setUpload({ phase: 'error', msg: 'Se me atoró la conexión al subir. Inténtalo de nuevo.' })
+    }
+  }
+
+  const resolveUpload = async (action: 'approve' | 'reject') => {
+    if (upload?.phase !== 'review') return
+    const { id, filename, text } = upload
+    try {
+      const res = await fetch('/api/constructor/kb', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: sidRef.current,
+          id,
+          action,
+          ...(action === 'approve' ? { text } : {}),
+        }),
+      })
+      const data = (await res.json()) as { ok?: boolean; chars?: number; error?: string }
+      if (!res.ok || !data.ok) {
+        setUpload({
+          phase: 'error',
+          msg: UPLOAD_ERRORS[data.error ?? ''] ?? 'No se pudo guardar. Inténtalo de nuevo.',
+        })
+        return
+      }
+      setUpload(null)
+      if (action === 'approve') {
+        /* aviso automático al agente (no es texto del dueño) para que lo confirme */
+        const safeName = filename.replace(/[^\w .()-]/g, '').slice(0, 80)
+        setBusy(true)
+        try {
+          const res2 = await fetch('/api/constructor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              builderSessionId: sidRef.current,
+              message: `[ARCHIVO] El dueño subió y aprobó "${safeName}" (${data.chars ?? 0} caracteres). Su contenido ya quedó guardado como información del negocio y se integrará al asistente al construirlo.`,
+              _h: '',
+            }),
+          })
+          const d2 = (await res2.json()) as { output?: string; stage?: Stage }
+          if (d2.output) {
+            setMessages((prev) => [
+              ...prev,
+              { id: crypto.randomUUID(), role: 'assistant', content: d2.output!.trim() },
+            ])
+          }
+          if (d2.stage) setStage(d2.stage)
+        } catch {}
+        setBusy(false)
+      }
+    } catch {
+      setUpload({ phase: 'error', msg: 'Se me atoró la conexión. Inténtalo de nuevo.' })
+    }
+  }
 
   const send = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -329,6 +434,50 @@ export function ConstructorChat() {
         />
       )}
 
+      {upload && upload.phase !== 'uploading' && (
+        <div className="border-t bg-bg/60 p-3">
+          {upload.phase === 'error' ? (
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-warn/40 bg-surface p-3">
+              <p className="text-xs text-warn">{upload.msg}</p>
+              <Button size="sm" variant="ghost" onClick={() => setUpload(null)}>
+                Cerrar
+              </Button>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-accent/40 bg-surface p-3">
+              <div className="flex items-center gap-2">
+                <FileText className="size-4 shrink-0 text-accent" />
+                <p className="min-w-0 truncate text-sm font-medium">{upload.filename}</p>
+                <span className="ml-auto shrink-0 text-xs text-text-muted">
+                  {upload.chars.toLocaleString('es-MX')} caracteres
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-text-muted">
+                Esto fue lo que leí. Revísalo y corrige lo que quieras — solo lo aprobado
+                aprende tu asistente.
+              </p>
+              <textarea
+                value={upload.text}
+                onChange={(e) =>
+                  setUpload({ ...upload, text: e.target.value, chars: e.target.value.length })
+                }
+                rows={6}
+                className="mt-2 w-full resize-y rounded-lg border bg-bg px-3 py-2 font-mono text-xs text-text outline-none focus-visible:border-accent"
+                aria-label="Contenido extraído del archivo"
+              />
+              <div className="mt-2 flex gap-2">
+                <Button size="sm" onClick={() => void resolveUpload('approve')}>
+                  Se ve bien, agrégalo
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => void resolveUpload('reject')}>
+                  Descartar
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {!tsVerified && siteKey && tsOverlay !== 'hidden' && (
         <div
           className={cn(
@@ -346,6 +495,29 @@ export function ConstructorChat() {
       )}
 
       <form onSubmit={send} className="flex items-center gap-2 border-t bg-bg/60 p-3">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.txt,.md,.csv,.docx"
+          className="hidden"
+          onChange={(e) => void pickFile(e)}
+          aria-label="Subir archivo del negocio"
+        />
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          aria-label="Subir menú o catálogo"
+          title="Sube tu menú, catálogo o lista de precios (PDF, Word, TXT, CSV)"
+          disabled={busy || upload?.phase === 'uploading' || (!tsVerified && !!siteKey && !tsToken)}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          {upload?.phase === 'uploading' ? (
+            <span className="size-3.5 animate-honey-pulse rounded-full bg-accent" />
+          ) : (
+            <Paperclip className="size-4" />
+          )}
+        </Button>
         <Input
           ref={inputRef}
           value={draft}
