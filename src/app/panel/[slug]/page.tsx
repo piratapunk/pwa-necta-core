@@ -21,6 +21,8 @@ type Overview = {
   conversations: number
   kb_chars: number
   kb_chunks: number
+  contacts: number
+  contacts_week: number
 }
 
 export default async function PanelResumen({
@@ -55,7 +57,7 @@ export default async function PanelResumen({
         </Button>
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm text-text-muted">Mensajes hoy</CardTitle>
@@ -73,6 +75,19 @@ export default async function PanelResumen({
           </CardHeader>
           <CardContent>
             <p className="font-display text-3xl font-bold">{o.conversations}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm text-text-muted">Clientes captados</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="font-display text-3xl font-bold">
+              {o.contacts}
+              {o.contacts_week > 0 && (
+                <span className="text-base font-normal text-success"> +{o.contacts_week} esta semana</span>
+              )}
+            </p>
           </CardContent>
         </Card>
         <Card>

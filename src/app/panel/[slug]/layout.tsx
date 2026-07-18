@@ -2,11 +2,13 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import {
   BarChart3,
+  Filter,
   FolderOpen,
   Home,
   MessageSquare,
   Plug,
   Sparkles,
+  UsersRound,
 } from 'lucide-react'
 
 import { NectaWordmark } from '@/components/brand/NectaMark'
@@ -20,6 +22,8 @@ export const dynamic = 'force-dynamic'
 const nav = [
   { href: '', label: 'Resumen', icon: Home },
   { href: '/conversaciones', label: 'Conversaciones', icon: MessageSquare },
+  { href: '/clientes', label: 'Clientes', icon: UsersRound },
+  { href: '/embudo', label: 'Embudo', icon: Filter },
   { href: '/archivos', label: 'Archivos y memoria', icon: FolderOpen },
   { href: '/conexiones', label: 'Conexiones', icon: Plug },
   { href: '/funciones', label: 'Funciones a la medida', icon: Sparkles },

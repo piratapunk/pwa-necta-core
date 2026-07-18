@@ -45,7 +45,9 @@ n8n `necta-tenant-chat`                [HMAC verificado en Postgres]
 | `bot_spec` | `src/lib/factory/spec.ts` (zod, `.strip()`) | forma única de los datos entre intake y provisioning; sin `capabilities`/`limits` (eso lo pone el plan server-side) |
 | `abi.provision_tenant(uuid, jsonb, key)` | Postgres, SECURITY DEFINER | provisioning atómico e idempotente; la app solo tiene EXECUTE, cero DDL fuera de la función |
 | `abi.tenant_chat_context(slug)` | Postgres | lectura de config+KB del tenant sin SQL dinámico en n8n; slug validado por regex |
-| `abi.tenant_log_message(slug, uuid, rol, texto)` | Postgres | escritura al schema del tenant, misma regla |
+| `abi.tenant_log_message(slug, uuid, rol, texto, meta?)` | Postgres | escritura al schema del tenant, misma regla; el `meta` (canal/teléfono/external_id de WhatsApp) alimenta el CRM, hace **captura determinista** (regex tel/email en mensajes del cliente) y devuelve el `mode` de la conversación — si es `human`, el brain se corta (takeover) |
+| `abi.tenant_capture_contact(slug, uuid, ...)` | Postgres | upsert de contacto al CRM del tenant (dedupe por teléfono/email, nunca pisa datos existentes) + bitácora en `leads`; lo llaman `tenant_log_message`, los workflows (marcador `<<<lead>>>` del brain, validado como DATO) y la app |
+| Contratos del panel CRM (`tenant_contacts_list/get/update/create`, `tenant_pipeline`, `tenant_conversation_set_mode`, `tenant_owner_reply`) | Postgres | ownership vía `user_owns_tenant` en cada llamada; límites acotados server-side (etapas whitelist, ≤20 tags); `tenant_owner_reply` registra `role='owner'`, pasa la plática a `human` y devuelve canal+external_id para el envío real por WhatsApp |
 | `abi.factory_slugify(nombre)` | Postgres | slugs únicos, transliterados, lista de reservados (www, api, admin, mcp, …) |
 | `abi.factory_verify_hmac(ts, body, sig)` | Postgres | verificación de firmas para n8n — el secreto no sale de la DB (revocada a `abi_app`) |
 | `abi.plan_limits` (tabla) | Postgres | **fuente única** de límites por plan (msgs/día, KB chars, archivos, MB crudos, chars extraídos, rag_enabled); `provision_tenant` la lee — cambiar un límite es un UPDATE, no un deploy |
@@ -79,8 +81,9 @@ la URL, secretos en git, secretos en el JSON de workflows n8n.
 ## 4. Multi-tenancy real (no inyección temporal)
 
 Cada cliente obtiene **de verdad**:
-- Un **schema Postgres propio** `t_<slug>` con sus 5 tablas — sus conversaciones, KB y
-  leads no comparten tablas con nadie.
+- Un **schema Postgres propio** `t_<slug>` con sus 6 tablas (`bot_config`, `kb_chunks`,
+  `conversations`, `messages`, `leads`, `contacts`) — sus conversaciones, KB, leads y su
+  CRM no comparten tablas con nadie.
 - Un **rol de login propio** `t_<slug>_app` con `usage` solo sobre su schema
   (verificado: `has_schema_privilege` cruzado = `false`). Ese rol es entregable al
   cliente enterprise el día que pida acceso directo a SUS datos.

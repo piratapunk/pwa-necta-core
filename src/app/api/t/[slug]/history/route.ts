@@ -16,7 +16,8 @@ export async function GET(
   if (!hasAllowedOrigin(req)) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   }
-  if (!rateLimit(`thist:${clientIp(req)}`, 30, 60_000)) {
+  /* el widget hace polling (~5 s) cuando la pestaña está visible */
+  if (!rateLimit(`thist:${clientIp(req)}`, 120, 60_000)) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }
   const sessionId = req.nextUrl.searchParams.get('sessionId') ?? ''
@@ -31,11 +32,12 @@ export async function GET(
     `
     const r = rows[0]?.r as {
       ok: boolean
-      messages: { role: string; content: string }[]
+      messages: { id: number; role: string; content: string }[]
+      mode?: string
     }
     /* la función ya regresa los últimos 40 en orden cronológico */
     const msgs = r?.ok ? (r.messages ?? []) : []
-    return NextResponse.json({ messages: msgs })
+    return NextResponse.json({ messages: msgs, mode: r?.mode ?? 'bot' })
   } catch {
     return NextResponse.json({ messages: [] })
   }

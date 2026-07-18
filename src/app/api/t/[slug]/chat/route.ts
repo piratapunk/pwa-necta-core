@@ -98,6 +98,10 @@ export async function POST(
     })
     if (!res.ok) return NextResponse.json({ output: FALLBACK })
     const data = (await res.json()) as Record<string, unknown>
+    /* modo humano: el bot calla — el dueño responde desde su panel */
+    if (data.queued === true) {
+      return NextResponse.json({ output: null, queued: true })
+    }
     const output =
       (typeof data.output === 'string' && data.output) || FALLBACK
     return NextResponse.json({ output })

@@ -94,6 +94,33 @@ export async function getWhatsAppConnectUrl(
   }
 }
 
+export async function sendInboxMessage(
+  conversationId: string,
+  text: string
+): Promise<boolean> {
+  const headers = authHeaders()
+  if (!headers) return false
+  try {
+    const res = await fetch(
+      `${BASE}/inbox/conversations/${encodeURIComponent(conversationId)}/messages`,
+      {
+        method: 'POST',
+        headers,
+        signal: AbortSignal.timeout(15_000),
+        body: JSON.stringify({ text: text.slice(0, 4000) }),
+      }
+    )
+    if (!res.ok) {
+      console.error('[zernio] inbox send status', res.status, (await res.text()).slice(0, 200))
+      return false
+    }
+    return true
+  } catch (err) {
+    console.error('[zernio] inbox send error', err)
+    return false
+  }
+}
+
 /* state firmado del redirect (anti-CSRF del callback) */
 function stateSecret(): string {
   const s = process.env.ABI_FACTORY_HMAC_SECRET

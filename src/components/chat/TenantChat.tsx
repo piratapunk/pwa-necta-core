@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Send } from 'lucide-react'
 
 import { Linkify } from '@/components/chat/Linkify'
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
-type Msg = { id: string; role: 'user' | 'assistant'; content: string }
+type Msg = { id: string; role: 'user' | 'assistant' | 'owner'; content: string }
 
 function getSid(slug: string): string {
   const key = `necta_tenant_sid_${slug}`
@@ -40,30 +40,51 @@ export function TenantChat({
   const [messages, setMessages] = useState<Msg[]>([])
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
+  const [humanMode, setHumanMode] = useState(false)
   const sidRef = useRef('')
+  const busyRef = useRef(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const hasUserMessages = messages.some((m) => m.role === 'user')
 
+  const syncHistory = useCallback(async () => {
+    if (busyRef.current) return
+    try {
+      const r = await fetch(`/api/t/${slug}/history?sessionId=${sidRef.current}`)
+      if (!r.ok) return
+      const data = (await r.json()) as {
+        messages?: { id?: number; role: Msg['role']; content: string }[]
+        mode?: string
+      }
+      if (busyRef.current) return
+      setHumanMode(data.mode === 'human')
+      if (data.messages?.length) {
+        setMessages([
+          { id: 'greeting', role: 'assistant', content: greeting },
+          ...data.messages.map((m) => ({
+            id: m.id != null ? `db-${m.id}` : crypto.randomUUID(),
+            role: m.role,
+            content: m.content,
+          })),
+        ])
+      }
+    } catch {}
+  }, [slug, greeting])
+
   useEffect(() => {
     sidRef.current = getSid(slug)
     setMessages([{ id: 'greeting', role: 'assistant', content: greeting }])
-    fetch(`/api/t/${slug}/history?sessionId=${sidRef.current}`)
-      .then((r) => r.json())
-      .then((data: { messages?: { role: 'user' | 'assistant'; content: string }[] }) => {
-        if (data.messages?.length) {
-          setMessages([
-            { id: 'greeting', role: 'assistant', content: greeting },
-            ...data.messages.map((m) => ({
-              id: crypto.randomUUID(),
-              role: m.role,
-              content: m.content,
-            })),
-          ])
-        }
-      })
-      .catch(() => {})
-  }, [slug, greeting])
+    void syncHistory()
+  }, [slug, greeting, syncHistory])
+
+  /* polling: si una persona del negocio entra a la plática, sus mensajes
+     aparecen sin recargar */
+  useEffect(() => {
+    const iv = setInterval(() => {
+      if (document.visibilityState === 'visible') void syncHistory()
+    }, 5000)
+    return () => clearInterval(iv)
+  }, [syncHistory])
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
@@ -83,9 +104,10 @@ export function TenantChat({
       { id: crypto.randomUUID(), role: 'user', content: text },
     ])
     setBusy(true)
+    busyRef.current = true
     try {
       const history = messages
-        .filter((m) => m.id !== 'greeting')
+        .filter((m) => m.id !== 'greeting' && m.role !== 'owner')
         .slice(-10)
         .map((m) => ({ role: m.role, content: m.content }))
       const body = JSON.stringify({
@@ -110,7 +132,12 @@ export function TenantChat({
         if (attempt === 0) await new Promise((r) => setTimeout(r, 1500))
       }
       if (!res) throw new Error('network')
-      const data = (await res.json()) as { output?: string }
+      const data = (await res.json()) as { output?: string | null; queued?: boolean }
+      if (data.queued) {
+        /* una persona del negocio tiene la plática: la respuesta llega por polling */
+        setHumanMode(true)
+        return
+      }
       setMessages((prev) => [
         ...prev,
         {
@@ -132,6 +159,7 @@ export function TenantChat({
       ])
     } finally {
       setBusy(false)
+      busyRef.current = false
     }
   }
 
@@ -139,20 +167,30 @@ export function TenantChat({
     <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border bg-surface">
       <div className="border-b bg-bg/60 px-4 py-3">
         <p className="font-display text-sm font-bold">{botName}</p>
-        <p className="text-xs text-text-muted">{busy ? 'escribiendo…' : 'en línea'}</p>
+        <p className="text-xs text-text-muted">
+          {busy
+            ? 'escribiendo…'
+            : humanMode
+              ? 'te atiende una persona del equipo'
+              : 'en línea'}
+        </p>
       </div>
       <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {messages.map((m) => (
-          <div
-            key={m.id}
-            className={cn(
-              'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
-              m.role === 'user'
-                ? 'ml-auto rounded-br-sm bg-accent text-on-accent'
-                : 'rounded-bl-sm bg-surface-raised text-text'
+          <div key={m.id} className={cn(m.role !== 'user' && 'space-y-0.5')}>
+            <div
+              className={cn(
+                'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
+                m.role === 'user'
+                  ? 'ml-auto rounded-br-sm bg-accent text-on-accent'
+                  : 'rounded-bl-sm bg-surface-raised text-text'
+              )}
+            >
+              <Linkify text={m.content} />
+            </div>
+            {m.role === 'owner' && (
+              <p className="text-[10px] text-text-muted">equipo de {botName}</p>
             )}
-          >
-            <Linkify text={m.content} />
           </div>
         ))}
         {busy && (
