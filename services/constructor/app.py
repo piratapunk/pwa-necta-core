@@ -260,8 +260,10 @@ class Session:
             return (
                 f"Borrador guardado. Resumen: asistente '{spec['persona']['bot_name']}' "
                 f"para {nombre_negocio} (giro {vertical}), tono {tono_v}. "
-                f"Dirección web reservada: https://{slug}.nectacore.com — "
-                f"pendiente de aprobación del dueño para construirse."
+                f"Dirección web RESERVADA (aún NO activa): {slug}.nectacore.com — "
+                f"la página cobra vida hasta que el bot se construya. Al presentarla "
+                f"al dueño, acláralo: 'quedará en {slug}.nectacore.com en cuanto lo "
+                f"construyamos' — no la presentes como si ya funcionara."
             )
 
         @tool
