@@ -6,6 +6,7 @@ import { ExternalLink, Send } from 'lucide-react'
 
 import { AbiBee } from '@/components/brand/AbiBee'
 import { Linkify } from '@/components/chat/Linkify'
+import { BuildSuccessCard } from '@/components/chat/BuildSuccessCard'
 import { PersonalityTuner } from '@/components/chat/PersonalityTuner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -93,8 +94,6 @@ export function ConstructorChat() {
   const [tsVerified, setTsVerified] = useState(false)
   /* overlay del reto: visible → fading (éxito, se desvanece) → hidden */
   const [tsOverlay, setTsOverlay] = useState<'visible' | 'fading' | 'hidden'>('visible')
-  const [claimEmail, setClaimEmail] = useState('')
-  const [claimState, setClaimState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const sidRef = useRef('')
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -105,6 +104,14 @@ export function ConstructorChat() {
 
   useEffect(() => {
     sidRef.current = getBuilderSession()
+    try {
+      const built = localStorage.getItem(`necta_built_${sidRef.current}`)
+      if (built) {
+        setBotUrl(built)
+        setStage('construido')
+        return
+      }
+    } catch {}
     setMessages([{ id: 'greeting', role: 'assistant', content: GREETING }])
     inputRef.current?.focus()
   }, [])
@@ -195,8 +202,12 @@ export function ConstructorChat() {
       ])
       if (data.stage) setStage(data.stage)
       if (data.provisioned?.subdomain) {
-        setBotUrl(`https://${data.provisioned.subdomain}`)
+        const url = `https://${data.provisioned.subdomain}`
+        setBotUrl(url)
         setStage('construido')
+        try {
+          localStorage.setItem(`necta_built_${sidRef.current}`, url)
+        } catch {}
       }
     } catch {
       setMessages((prev) => [
@@ -238,65 +249,19 @@ export function ConstructorChat() {
         <HoneycombProgress filled={STAGE_CELLS[stage]} />
       </div>
 
-      {botUrl && (
-        <div className="border-b bg-accent-soft">
-          <a
-            href={botUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-accent hover:underline"
-          >
-            Tu bot ya está en línea — pruébalo aquí
-            <ExternalLink className="size-4" />
-          </a>
-          {claimState !== 'sent' ? (
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault()
-                if (!claimEmail.trim() || claimState === 'sending') return
-                setClaimState('sending')
-                try {
-                  const res = await fetch('/api/auth/request-link', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      email: claimEmail.trim(),
-                      builderSessionId: sidRef.current,
-                      _h: '',
-                    }),
-                  })
-                  setClaimState(res.ok ? 'sent' : 'error')
-                } catch {
-                  setClaimState('error')
-                }
-              }}
-              className="flex items-center gap-2 px-4 pb-3"
-            >
-              <Input
-                type="email"
-                value={claimEmail}
-                onChange={(e) => setClaimEmail(e.target.value)}
-                placeholder="Tu correo — para que el bot quede a tu nombre"
-                aria-label="Correo para reclamar tu bot"
-                className="h-9 bg-surface text-xs"
-              />
-              <Button type="submit" size="sm" disabled={claimState === 'sending'}>
-                {claimState === 'sending' ? 'Enviando…' : 'Ligarlo a mí'}
-              </Button>
-            </form>
-          ) : (
-            <p className="px-4 pb-3 text-center text-xs text-text-muted">
-              Te mandé un enlace de acceso 🐝 revisa tu correo.
-            </p>
-          )}
-          {claimState === 'error' && (
-            <p className="px-4 pb-3 text-center text-xs text-warn">
-              No pude mandar el correo ahorita — tu bot sigue en línea; inténtalo más tarde.
-            </p>
-          )}
-        </div>
-      )}
-
+      {botUrl ? (
+        <BuildSuccessCard
+          botUrl={botUrl}
+          botName={botUrl
+            .replace('https://', '')
+            .split('.')[0]
+            .split('-')
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ')}
+          builderSessionId={sidRef.current}
+        />
+      ) : (
+        <>
       <div ref={scrollRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {messages.map((m) => (
           <div
@@ -373,6 +338,8 @@ export function ConstructorChat() {
           <Send className="size-4" />
         </Button>
       </form>
+        </>
+      )}
     </div>
   )
 }
