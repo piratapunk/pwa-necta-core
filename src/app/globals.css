@@ -39,6 +39,9 @@
   --edge-light: oklch(1 0 0 / 6%);
   --shadow-ambient: 0 8px 32px oklch(0 0 0 / 35%);
 
+  /* burbuja del asistente en chats (light la entibia a crema) */
+  --bubble: oklch(0.2350 0.0120 75);
+
   /* estados */
   --success: oklch(0.7200 0.1300 130);
   --warn: oklch(0.6800 0.1500 50);
@@ -69,6 +72,8 @@
   --edge-light: transparent;
   --shadow-ambient: 0 8px 28px oklch(0 0 0 / 10%);
 
+  --bubble: oklch(0.9550 0.0280 85);
+
   --success: oklch(0.5500 0.1200 135);
   --warn: oklch(0.5600 0.1400 45);
   --premium: oklch(0.5200 0.1200 290);
@@ -89,6 +94,7 @@
   --color-success: var(--success);
   --color-warn: var(--warn);
   --color-premium: var(--premium);
+  --color-bubble: var(--bubble);
 
   /* mapa semántico shadcn → tokens de la casa */
   --color-background: var(--bg);
@@ -136,6 +142,21 @@
 @keyframes honey-fill {
   from { transform: scaleY(0); }
   to { transform: scaleY(1); }
+}
+
+@keyframes hex-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(2deg); }
+}
+
+@keyframes bee-bob {
+  0%, 100% { transform: rotate(6deg) translateY(0); }
+  50% { transform: rotate(9deg) translateY(-5px); }
+}
+
+@keyframes line-up {
+  from { transform: translateY(112%); }
+  to { transform: translateY(0); }
 }
 
 @layer base {
@@ -187,6 +208,17 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--accent);
+  }
+
+  /* revelado editorial del hero: líneas que suben tras una máscara */
+  .line-mask {
+    display: block;
+    overflow: hidden;
+  }
+  .line-mask > span {
+    display: block;
+    animation: line-up 1s var(--ease-out-expo) both;
+    animation-delay: var(--line-delay, 0ms);
   }
 
   /* scroll reveal — se activa solo con JS (html.js), threshold en <Reveal/> */

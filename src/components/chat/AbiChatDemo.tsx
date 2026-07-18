@@ -67,15 +67,15 @@ export function AbiChatDemo({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'elev rounded-xl border bg-surface/90 p-4 backdrop-blur-sm',
+        'elev relative rounded-xl border bg-surface/90 p-4 backdrop-blur-sm',
         className
       )}
     >
+      {/* Abi asomada sobre la esquina de la tarjeta */}
+      <AbiBee className="absolute -top-8 right-5 animate-[bee-bob_6s_ease-in-out_infinite] text-5xl" />
+
       <div className="mb-3 flex items-center justify-between border-b pb-3">
-        <div className="flex items-center gap-2.5">
-          <AbiBee className="text-2xl" />
-          <p className="font-display text-sm font-bold">Abi</p>
-        </div>
+        <p className="font-display text-sm font-bold">Abi</p>
         <span className="flex items-center gap-1.5 text-xs text-success">
           <span className="size-1.5 rounded-full bg-success" /> en línea
         </span>
@@ -89,14 +89,14 @@ export function AbiChatDemo({ className }: { className?: string }) {
               'max-w-[85%] animate-fade-up rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
               turn.role === 'user'
                 ? 'ml-auto rounded-br-sm bg-accent text-on-accent'
-                : 'rounded-bl-sm bg-surface-raised text-text'
+                : 'rounded-bl-sm bg-bubble text-text'
             )}
           >
             {turn.text}
           </div>
         ))}
         {typing && (
-          <div className="flex w-fit items-center gap-1.5 rounded-2xl rounded-bl-sm bg-surface-raised px-4 py-3">
+          <div className="flex w-fit items-center gap-1.5 rounded-2xl rounded-bl-sm bg-bubble px-4 py-3">
             <span className="size-1.5 animate-honey-pulse rounded-full bg-accent" />
             <span className="size-1.5 animate-honey-pulse rounded-full bg-accent [animation-delay:0.4s]" />
             <span className="size-1.5 animate-honey-pulse rounded-full bg-accent [animation-delay:0.8s]" />

@@ -78,14 +78,14 @@ export function ChatWidget() {
                   'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
                   m.role === 'user'
                     ? 'ml-auto rounded-br-sm bg-accent text-on-accent'
-                    : 'rounded-bl-sm bg-surface-raised text-text'
+                    : 'rounded-bl-sm bg-bubble text-text'
                 )}
               >
                 <Linkify text={m.visible} />
               </div>
             ))}
             {isThinking && (
-              <div className="flex w-fit items-center gap-1.5 rounded-2xl rounded-bl-sm bg-surface-raised px-4 py-3">
+              <div className="flex w-fit items-center gap-1.5 rounded-2xl rounded-bl-sm bg-bubble px-4 py-3">
                 <span className="size-1.5 animate-honey-pulse rounded-full bg-accent" />
                 <span className="size-1.5 animate-honey-pulse rounded-full bg-accent [animation-delay:0.4s]" />
                 <span className="size-1.5 animate-honey-pulse rounded-full bg-accent [animation-delay:0.8s]" />
