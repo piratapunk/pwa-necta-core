@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { AbiBee } from '@/components/brand/AbiBee'
 import { cn } from '@/lib/utils'
 
 /*
@@ -72,9 +73,7 @@ export function AbiChatDemo({ className }: { className?: string }) {
     >
       <div className="mb-3 flex items-center justify-between border-b pb-3">
         <div className="flex items-center gap-2.5">
-          <span className="text-2xl" aria-hidden>
-            🐝
-          </span>
+          <AbiBee className="text-2xl" />
           <p className="font-display text-sm font-bold">Abi</p>
         </div>
         <span className="flex items-center gap-1.5 text-xs text-success">
