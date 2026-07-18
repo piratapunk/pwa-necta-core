@@ -1,3 +1,5 @@
+import { createHmac, timingSafeEqual } from 'node:crypto'
+
 /* Verificación server-side de Cloudflare Turnstile (siteverify). */
 
 export async function verifyTurnstile(
@@ -28,23 +30,39 @@ export async function verifyTurnstile(
   }
 }
 
-/* Sesiones del constructor ya verificadas (memoria de proceso, TTL 2 h). */
-const verified = new Map<string, number>()
+/*
+ * "Ya verificado" como cookie FIRMADA (24 h) — sin estado en memoria: los
+ * deploys no borran la verificación y el usuario no repite el reto.
+ */
 
-export function isSessionVerified(sid: string): boolean {
-  const at = verified.get(sid)
-  if (!at) return false
-  if (Date.now() - at > 2 * 3_600_000) {
-    verified.delete(sid)
-    return false
-  }
-  return true
+export const HUMAN_COOKIE = 'abi_hv'
+const HUMAN_TTL_S = 86_400
+
+function secret(): string {
+  return process.env.ABI_FACTORY_HMAC_SECRET ?? ''
 }
 
-export function markSessionVerified(sid: string): void {
-  if (verified.size > 5_000) {
-    const cutoff = Date.now() - 2 * 3_600_000
-    for (const [k, v] of verified) if (v < cutoff) verified.delete(k)
-  }
-  verified.set(sid, Date.now())
+export function makeHumanCookie(): string {
+  const ts = Math.floor(Date.now() / 1000)
+  const sig = createHmac('sha256', secret()).update(`hv.${ts}`).digest('hex')
+  return `${ts}.${sig}`
+}
+
+export function isHumanCookieValid(value: string | undefined): boolean {
+  if (!value) return false
+  const m = /^(\d+)\.([0-9a-f]{64})$/.exec(value)
+  if (!m) return false
+  const ts = Number(m[1])
+  if (Date.now() / 1000 - ts > HUMAN_TTL_S) return false
+  const expected = createHmac('sha256', secret()).update(`hv.${ts}`).digest()
+  const got = Buffer.from(m[2], 'hex')
+  return expected.length === got.length && timingSafeEqual(expected, got)
+}
+
+export const HUMAN_COOKIE_OPTS = {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'lax' as const,
+  maxAge: HUMAN_TTL_S,
+  path: '/',
 }

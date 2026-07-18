@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { getSql } from '@/lib/db'
 import { botSpecSchema } from '@/lib/factory/spec'
 import { clientIp, hasAllowedOrigin, rateLimit } from '@/lib/security'
-import { isSessionVerified, verifyTurnstile } from '@/lib/turnstile'
+import { HUMAN_COOKIE, isHumanCookieValid, verifyTurnstile } from '@/lib/turnstile'
 
 /*
  * Materializa un bot_spec: schema propio + rol propio + subdominio, vía el
@@ -38,9 +38,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'bad_request' }, { status: 400 })
   }
 
-  /* humano verificado: o la sesión ya pasó Turnstile en el constructor, o
-     trae token propio */
-  if (!isSessionVerified(body.builderSessionId)) {
+  /* humano verificado: cookie firmada del constructor, o token propio */
+  if (!isHumanCookieValid(req.cookies.get(HUMAN_COOKIE)?.value)) {
     const ok = body.turnstileToken
       ? await verifyTurnstile(body.turnstileToken, ip)
       : false

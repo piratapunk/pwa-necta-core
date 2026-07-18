@@ -9,8 +9,10 @@ import {
   rateLimit,
 } from '@/lib/security'
 import {
-  isSessionVerified,
-  markSessionVerified,
+  HUMAN_COOKIE,
+  HUMAN_COOKIE_OPTS,
+  isHumanCookieValid,
+  makeHumanCookie,
   verifyTurnstile,
 } from '@/lib/turnstile'
 
@@ -52,8 +54,9 @@ export async function POST(req: NextRequest) {
   if (!rateLimit(`ctor-sid:${body.builderSessionId}`, 10, 60_000)) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }
-  /* primera vez por sesión: exige Turnstile (anti-bot del provisioning) */
-  if (!isSessionVerified(body.builderSessionId)) {
+  /* verificación humana por cookie firmada (24 h, sobrevive deploys) */
+  let setHumanCookie = false
+  if (!isHumanCookieValid(req.cookies.get(HUMAN_COOKIE)?.value)) {
     if (!body.turnstileToken) {
       return NextResponse.json({ error: 'turnstile_required' }, { status: 403 })
     }
@@ -61,7 +64,7 @@ export async function POST(req: NextRequest) {
     if (!ok) {
       return NextResponse.json({ error: 'turnstile_failed' }, { status: 403 })
     }
-    markSessionVerified(body.builderSessionId)
+    setHumanCookie = true
   }
 
   if (looksLikeInjection(body.message)) {
@@ -100,12 +103,14 @@ export async function POST(req: NextRequest) {
       stage?: string
       turns?: number
     }
-    return NextResponse.json({
+    const out = NextResponse.json({
       output: (typeof data.output === 'string' && data.output) || FALLBACK,
       provisioned: data.provisioned ?? null,
       stage: data.stage ?? 'conversando',
       turns: data.turns ?? 0,
     })
+    if (setHumanCookie) out.cookies.set(HUMAN_COOKIE, makeHumanCookie(), HUMAN_COOKIE_OPTS)
+    return out
   } catch {
     return NextResponse.json({ output: FALLBACK })
   }
