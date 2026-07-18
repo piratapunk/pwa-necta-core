@@ -108,6 +108,7 @@ export function ConstructorChat() {
   const [tsToken, setTsToken] = useState<string | null>(null)
   const [tsVerified, setTsVerified] = useState(false)
   const [upload, setUpload] = useState<Upload | null>(null)
+  const [tunerReopen, setTunerReopen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   /* overlay del reto: visible → fading (éxito, se desvanece) → hidden */
   const [tsOverlay, setTsOverlay] = useState<'visible' | 'fading' | 'hidden'>('visible')
@@ -269,9 +270,13 @@ export function ConstructorChat() {
     }
   }
 
-  const send = async (e: React.FormEvent) => {
+  const send = (e: React.FormEvent) => {
     e.preventDefault()
-    const text = draft.trim()
+    void sendText(draft)
+  }
+
+  const sendText = async (raw: string) => {
+    const text = raw.trim()
     if (!text || busy) return
     setDraft('')
     setMessages((prev) => [
@@ -416,10 +421,11 @@ export function ConstructorChat() {
         )}
       </div>
 
-      {stage === 'borrador' && (
+      {(stage === 'borrador' || tunerReopen) && (
         <PersonalityTuner
           builderSessionId={sidRef.current}
           onDone={() => {
+            setTunerReopen(false)
             setStage('afinado')
             setMessages((prev) => [
               ...prev,
@@ -494,7 +500,25 @@ export function ConstructorChat() {
         </div>
       )}
 
-      <form onSubmit={send} className="flex items-center gap-2 border-t bg-bg/60 p-3">
+      {stage === 'afinado' && !tunerReopen && !busy && (
+        /* acciones directas: que no tenga que leer ni teclear para avanzar */
+        <div className="flex flex-wrap items-center gap-2 border-t bg-bg/60 px-3 pt-3">
+          <Button size="sm" onClick={() => void sendText('constrúyelo')}>
+            Constrúyelo 🐝
+          </Button>
+          <Button size="sm" variant="secondary" onClick={() => setTunerReopen(true)}>
+            Ajustar personalidad
+          </Button>
+        </div>
+      )}
+
+      <form
+        onSubmit={send}
+        className={cn(
+          'flex items-center gap-2 bg-bg/60 p-3',
+          !(stage === 'afinado' && !tunerReopen && !busy) && 'border-t'
+        )}
+      >
         <input
           ref={fileInputRef}
           type="file"
