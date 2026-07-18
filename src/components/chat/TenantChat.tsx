@@ -30,16 +30,20 @@ export function TenantChat({
   slug,
   botName,
   greeting,
+  suggestions = [],
 }: {
   slug: string
   botName: string
   greeting: string
+  suggestions?: string[]
 }) {
   const [messages, setMessages] = useState<Msg[]>([])
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
   const sidRef = useRef('')
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  const hasUserMessages = messages.some((m) => m.role === 'user')
 
   useEffect(() => {
     sidRef.current = getSid(slug)
@@ -65,9 +69,13 @@ export function TenantChat({
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
   }, [messages, busy])
 
-  const send = async (e: React.FormEvent) => {
+  const send = (e: React.FormEvent) => {
     e.preventDefault()
-    const text = draft.trim()
+    void sendText(draft)
+  }
+
+  const sendText = async (raw: string) => {
+    const text = raw.trim()
     if (!text || busy) return
     setDraft('')
     setMessages((prev) => [
@@ -140,6 +148,21 @@ export function TenantChat({
             <span className="size-1.5 animate-honey-pulse rounded-full bg-accent" />
             <span className="size-1.5 animate-honey-pulse rounded-full bg-accent [animation-delay:0.4s]" />
             <span className="size-1.5 animate-honey-pulse rounded-full bg-accent [animation-delay:0.8s]" />
+          </div>
+        )}
+
+        {!hasUserMessages && !busy && suggestions.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {suggestions.map((q) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => void sendText(q)}
+                className="rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 text-xs text-accent transition-colors hover:bg-accent hover:text-on-accent"
+              >
+                {q}
+              </button>
+            ))}
           </div>
         )}
       </div>

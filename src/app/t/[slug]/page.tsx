@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { TenantChat } from '@/components/chat/TenantChat'
 import { getSql } from '@/lib/db'
 import { SLUG_RE } from '@/lib/factory/spec'
+import { suggestionsFor } from '@/lib/suggestions'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,6 +17,7 @@ type TenantContext = {
       bot_name: string
       business_name: string
       greeting: string
+      vertical?: string
     }
   }
 }
@@ -67,6 +69,7 @@ export default async function TenantBotPage({
         slug={tenant.slug}
         botName={persona.bot_name}
         greeting={persona.greeting}
+        suggestions={suggestionsFor(persona.vertical)}
       />
       <p className="mt-3 shrink-0 text-center text-xs text-text-muted sm:mt-4">
         Creado con{' '}
