@@ -58,18 +58,18 @@ export default async function TenantBotPage({
   const persona = tenant.config.persona
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-8rem)] max-w-2xl flex-col px-4 py-8 sm:px-6">
-      <div className="mb-6 text-center">
+    <div className="mx-auto flex h-[100dvh] max-w-2xl flex-col px-4 pb-4 pt-5 sm:px-6 sm:pb-6 sm:pt-8">
+      <div className="mb-4 shrink-0 text-center sm:mb-6">
         <p className="t-eyebrow">Asistente de</p>
-        <h1 className="mt-1 text-3xl font-bold">{tenant.name}</h1>
+        <h1 className="mt-1 text-2xl font-bold sm:text-3xl">{tenant.name}</h1>
       </div>
       <TenantChat
         slug={tenant.slug}
         botName={persona.bot_name}
         greeting={persona.greeting}
       />
-      <p className="mt-6 text-center text-xs text-text-muted">
-        Este asistente fue creado con{' '}
+      <p className="mt-3 shrink-0 text-center text-xs text-text-muted sm:mt-4">
+        Creado con{' '}
         <a href="https://nectacore.com" className="text-accent hover:underline">
           Abi · NectaCore
         </a>{' '}

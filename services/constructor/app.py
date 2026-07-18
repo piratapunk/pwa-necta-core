@@ -61,6 +61,23 @@ def _q(sql: str, *args):
             return row[0] if row else None
 
 
+# Post-filtro determinista: Gemini se resbala con rellenos pese al prompt.
+_FILLER_RE = re.compile(
+    r"^\s*[¡!]*\s*(claro que sí|claro|excelente( elección)?|perfecto|"
+    r"por supuesto|genial|qué bien|qué buena (pregunta|elección)|"
+    r"con gusto|entendido)\s*[!¡.,…]*\s*",
+    re.IGNORECASE,
+)
+
+
+def strip_filler(text: str) -> str:
+    out = _FILLER_RE.sub("", text, count=1).lstrip()
+    if out and out[0].islower():
+        # la frase quedó empezando en minúscula tras cortar el relleno
+        out = out[0].upper() + out[1:]
+    return out or text
+
+
 # ── Refinador de personalidad (subagente) ────────────────────────────────────
 # Cada opción del cuestionario aporta un machote concreto al prompt final.
 
@@ -421,7 +438,7 @@ async def chat(request: Request):
         output = "Se me atoró algo aquí adentro. ¿Me lo repites?"
 
     return {
-        "output": output.strip() or "¿Me lo repites? No te leí bien.",
+        "output": strip_filler(output.strip()) or "¿Me lo repites? No te leí bien.",
         "provisioned": sess.provisioned,
         "stage": sess.stage,
         "turns": sess.turns,

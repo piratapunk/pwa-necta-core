@@ -7,6 +7,7 @@ import { ExternalLink, Send } from 'lucide-react'
 import { AbiBee } from '@/components/brand/AbiBee'
 import { Linkify } from '@/components/chat/Linkify'
 import { BuildSuccessCard } from '@/components/chat/BuildSuccessCard'
+import { BuildingOverlay } from '@/components/chat/BuildingOverlay'
 import { PersonalityTuner } from '@/components/chat/PersonalityTuner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -89,6 +90,7 @@ export function ConstructorChat() {
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
   const [botUrl, setBotUrl] = useState<string | null>(null)
+  const [building, setBuilding] = useState(false)
   const [stage, setStage] = useState<Stage>('inicio')
   const [tsToken, setTsToken] = useState<string | null>(null)
   const [tsVerified, setTsVerified] = useState(false)
@@ -99,6 +101,7 @@ export function ConstructorChat() {
   const inputRef = useRef<HTMLInputElement>(null)
   const tsContainer = useRef<HTMLDivElement>(null)
   const tsRendered = useRef(false)
+  const pendingUrlRef = useRef<string | null>(null)
 
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
@@ -217,11 +220,11 @@ export function ConstructorChat() {
       if (data.stage) setStage(data.stage)
       if (data.provisioned?.subdomain) {
         const url = `https://${data.provisioned.subdomain}`
-        setBotUrl(url)
-        setStage('construido')
         try {
           localStorage.setItem(`necta_built_${sidRef.current}`, url)
         } catch {}
+        setBuilding(true)
+        pendingUrlRef.current = url
       }
     } catch {
       setMessages((prev) => [
@@ -263,7 +266,15 @@ export function ConstructorChat() {
         <HoneycombProgress filled={STAGE_CELLS[stage]} />
       </div>
 
-      {botUrl ? (
+      {building ? (
+        <BuildingOverlay
+          onDone={() => {
+            setBuilding(false)
+            setBotUrl(pendingUrlRef.current)
+            setStage('construido')
+          }}
+        />
+      ) : botUrl ? (
         <BuildSuccessCard
           botUrl={botUrl}
           botName={botUrl
