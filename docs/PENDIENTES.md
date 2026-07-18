@@ -4,7 +4,17 @@
 > Contexto: `FACTORY-ARCHITECTURE.md`, `CAPACITY-EXPO.md`, `ROADMAP.md`.
 > Última revisión: 2026-07-17 (segunda pasada — cerrados S1, S2, S4, S5, O3, O4, P6 y parte de P1).
 
-## ✅ Cerrados en esta pasada
+## ✅ Pulido de UI/flujo (2026-07-17, autónomo)
+
+- **Labor illusion en el build**: interludio narrado (~5s, panal llenándose de miel, pasos "Leyendo tu info… Afinando el tono…") entre "constrúyelo" y la tarjeta de éxito. El provisioning es instantáneo; esto sube el valor percibido (`UX-PSYCHOLOGY.md`). Respeta reduced-motion.
+- **Tarjeta de éxito de cierre**: al construir, el chat se retira y entra tarjeta con liga (copiar/abrir), claim SIEMPRE visible y **mini-chat de prueba embebido**. Restaurable al recargar (localStorage + `/api/constructor/status`).
+- **Preguntas sugeridas por vertical** en los bots de tenant: chips ("¿Cuál es el menú?", "¿Hacen entregas?"…) hasta el primer mensaje — invitan a interactuar (patrón de la casa).
+- **Post-filtro anti-rellenos** (P6): filtro determinista en el servicio del Constructor quita "¡Excelente!/¡Claro!/¡Perfecto!" del inicio de las respuestas de Abi — garantizado, no depende del prompt.
+- **Chat de tenant full-height en móvil** + **reintento automático** ante fallos transitorios (521 de deploy, WiFi de venue — expo-ready).
+- **CSP: Cloudflare Insights permitido** — fin del error de consola en subdominios + analítica de tráfico gratis para la Expo.
+- **404 con marca** (Abi) en vez del genérico de sistema.
+
+## ✅ Cerrados en pasadas anteriores
 
 | # | Qué | Cómo quedó |
 |---|---|---|
