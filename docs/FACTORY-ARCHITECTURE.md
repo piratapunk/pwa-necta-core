@@ -53,6 +53,7 @@ n8n `necta-tenant-chat`                [HMAC verificado en Postgres]
 | `abi.plan_limits` (tabla) | Postgres | **fuente única** de límites por plan (msgs/día, KB chars, archivos, MB crudos, chars extraídos, rag_enabled); `provision_tenant` la lee — cambiar un límite es un UPDATE, no un deploy |
 | `abi.claim_tenant(session, user_id)` | Postgres | liga los bots de una builder_session al usuario autenticado (GoTrue); idempotente; el user_id viene de la sesión verificada server-side |
 | `abi.user_tenants(user_id)` | Postgres | lista de bots del usuario para `/mis-bots` y el futuro panel |
+| `abi.kb_sources` (tabla) | Postgres | **cuarentena de documentos** (`SECURITY.md`): `quarantined → sanitized → approved | rejected`; extracción solo-texto en el servicio (`/extract`, HMAC), sanitización capas 1+3 en la app (`src/lib/factory/sanitize.ts`), preview editable del dueño, y `provision_tenant` materializa SOLO `approved` a `kb_chunks` dentro de los límites del plan |
 | Firma de canal | `src/lib/factory/hmac.ts` | header `x-abi-signature: t=<ts>,v1=<hmac>` |
 
 ## 3. Modelo de tokens y secretos (lo consultado en tahona, aplicado)
