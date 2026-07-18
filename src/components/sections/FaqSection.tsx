@@ -1,3 +1,4 @@
+import { Reveal } from '@/components/Reveal'
 import {
   Accordion,
   AccordionContent,
@@ -34,23 +35,25 @@ const faqs = [
 
 export function FaqSection() {
   return (
-    <section className="border-t">
-      <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6">
-        <div className="text-center">
+    <section>
+      <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6 sm:py-24">
+        <Reveal>
           <p className="t-eyebrow">Dudas frecuentes</p>
-          <h2 className="mt-3 text-3xl font-bold sm:text-4xl">
+          <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">
             Lo que todos preguntan antes de empezar
           </h2>
-        </div>
+        </Reveal>
 
-        <Accordion type="single" collapsible className="mt-10">
-          {faqs.map((f) => (
-            <AccordionItem key={f.q} value={f.q}>
-              <AccordionTrigger className="text-base">{f.q}</AccordionTrigger>
-              <AccordionContent className="leading-relaxed">{f.a}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <Reveal delay={100}>
+          <Accordion type="single" collapsible className="mt-10">
+            {faqs.map((f) => (
+              <AccordionItem key={f.q} value={f.q}>
+                <AccordionTrigger className="text-base">{f.q}</AccordionTrigger>
+                <AccordionContent className="leading-relaxed">{f.a}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </Reveal>
       </div>
     </section>
   )

@@ -46,7 +46,7 @@ export default async function PanelConexiones({
       <div className="flex items-center justify-between">
         <div>
           <p className="t-eyebrow">Conexiones</p>
-          <h1 className="mt-1 text-2xl font-bold">Los canales de tu bot</h1>
+          <h1 className="mt-1 text-2xl font-semibold">Los canales de tu asistente</h1>
         </div>
       </div>
 

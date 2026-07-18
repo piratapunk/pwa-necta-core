@@ -61,7 +61,7 @@ export function ChatWidget() {
               <div>
                 <p className="font-display text-sm font-bold leading-tight">Abi</p>
                 <p className="text-xs text-text-muted">
-                  {isThinking ? 'escribiendo…' : 'tu constructora de bots'}
+                  {isThinking ? 'escribiendo…' : 'tu abejita constructora'}
                 </p>
               </div>
             </div>

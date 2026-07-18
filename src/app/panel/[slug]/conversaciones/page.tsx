@@ -31,13 +31,13 @@ export default async function PanelConversaciones({
   return (
     <div className="mx-auto max-w-4xl">
       <p className="t-eyebrow">Conversaciones</p>
-      <h1 className="mt-1 text-2xl font-bold">Lo que tu bot ha atendido</h1>
+      <h1 className="mt-1 text-2xl font-semibold">Lo que tu asistente ha atendido</h1>
 
       {convs.length === 0 ? (
         <div className="mt-10 rounded-xl border bg-surface p-10 text-center">
           <MessageSquare className="mx-auto size-8 text-text-muted" />
           <p className="mt-3 text-sm text-text-muted">
-            Aún no hay conversaciones. Comparte tu bot y aquí verás cada plática.
+            Aún no hay conversaciones. Comparte tu asistente y aquí verás cada plática.
           </p>
         </div>
       ) : (

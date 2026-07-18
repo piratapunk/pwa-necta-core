@@ -29,9 +29,9 @@ export default async function PanelArchivos({
   return (
     <div className="mx-auto max-w-4xl">
       <p className="t-eyebrow">Archivos y memoria</p>
-      <h1 className="mt-1 text-2xl font-bold">Lo que tu bot sabe</h1>
+      <h1 className="mt-1 text-2xl font-semibold">Lo que tu asistente sabe</h1>
       <p className="mt-2 text-sm text-text-muted">
-        La memoria de tu bot es la información que le diste en el Constructor.
+        La memoria de tu asistente es la información que le diste en el Constructor.
         Tu plan permite {o.limits?.files_max ?? 1} archivo(s) de hasta{' '}
         {o.limits?.file_max_mb ?? 2} MB.
       </p>

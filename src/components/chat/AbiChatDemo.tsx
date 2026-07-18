@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 type Turn = { role: 'assistant' | 'user'; text: string }
 
 const SCRIPT: Turn[] = [
-  { role: 'assistant', text: 'Hola, soy Abi 🐝 ¿A qué se dedica tu negocio?' },
+  { role: 'assistant', text: 'Hola, soy Abi 🐝 Cuéntame, ¿a qué se dedica tu negocio?' },
   { role: 'user', text: 'Tengo una taquería en Guadalajara' },
   {
     role: 'assistant',
@@ -67,7 +67,7 @@ export function AbiChatDemo({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'rounded-2xl border bg-surface/90 p-4 shadow-2xl backdrop-blur-sm honey-glow',
+        'elev rounded-xl border bg-surface/90 p-4 backdrop-blur-sm',
         className
       )}
     >

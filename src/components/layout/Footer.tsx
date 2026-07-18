@@ -10,15 +10,15 @@ export function Footer() {
           <div className="space-y-3">
             <NectaWordmark />
             <p className="max-w-xs text-sm text-text-muted">
-              La fábrica de asistentes para tu negocio. Tú traes lo que sabes;
-              la colmena lo vuelve trabajo hecho.
+              La colmena de asistentes para tu negocio. Tú traes lo que sabes;
+              las obreras lo vuelven trabajo hecho.
             </p>
           </div>
 
           <div className="text-sm">
             <p className="t-eyebrow mb-3">Producto</p>
             <ul className="space-y-2 text-text-muted">
-              <li><a href="#abi" className="hover:text-text">Abi, tu constructora de bots</a></li>
+              <li><a href="#abi" className="hover:text-text">Abi, la abejita constructora</a></li>
               <li><a href="#capacidades" className="hover:text-text">Capacidades</a></li>
               <li><a href="#crm" className="hover:text-text">CRM incluido</a></li>
               <li><a href="#planes" className="hover:text-text">Planes</a></li>

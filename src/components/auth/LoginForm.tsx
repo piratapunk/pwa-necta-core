@@ -31,7 +31,7 @@ export function LoginForm() {
     return (
       <div className="rounded-2xl border bg-surface p-8 text-center">
         <Mail className="mx-auto size-10 text-accent" />
-        <h1 className="mt-4 text-xl font-bold">Revisa tu correo 🐝</h1>
+        <h1 className="mt-4 text-xl font-semibold">Revisa tu correo 🐝</h1>
         <p className="mt-2 text-sm text-text-muted">
           Si tienes cuenta con nosotros, te mandé un enlace de acceso a{' '}
           <span className="text-text">{email}</span>. Ábrelo y entras directo a
@@ -55,7 +55,7 @@ export function LoginForm() {
     <div className="rounded-2xl border bg-surface p-8">
       <div className="text-center">
         <AbiBee className="mx-auto block text-5xl" />
-        <h1 className="mt-4 text-2xl font-bold">Entra a tu cuenta</h1>
+        <h1 className="mt-4 text-2xl font-semibold">Entra a tu cuenta</h1>
         <p className="mt-2 text-sm text-text-muted">
           Sin contraseñas. Te mandamos un enlace a tu correo y entras al instante.
         </p>

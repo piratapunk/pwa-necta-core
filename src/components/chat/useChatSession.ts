@@ -13,7 +13,7 @@ export type ChatMessage = {
 
 const SID_KEY = 'necta_chat_sid'
 const GREETING =
-  'Hola, soy Abi 🐝 Te ayudo a armar tu asistente. ¿A qué se dedica tu negocio?'
+  'Hola, soy Abi 🐝 Cuéntame, ¿a qué se dedica tu negocio? De ahí te armo tu asistente.'
 
 function getSessionId(): string {
   try {

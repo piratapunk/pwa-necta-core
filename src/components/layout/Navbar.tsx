@@ -21,7 +21,7 @@ export function Navbar() {
   const { openChat } = useChat()
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-bg/80 backdrop-blur-md">
+    <header className="glass sticky top-0 z-40 border-b">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" aria-label="NectaCore — inicio">
           <NectaWordmark />

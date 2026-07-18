@@ -16,7 +16,7 @@ const STEPS = [
   'Enseñándole tus precios y horarios…',
   'Armando su memoria…',
   'Dándole su dirección web…',
-  'Poniéndolo en línea…',
+  'Soltándolo a zumbar…',
 ]
 
 export function BuildingOverlay({ onDone }: { onDone: () => void }) {

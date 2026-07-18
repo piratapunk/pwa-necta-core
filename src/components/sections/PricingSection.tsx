@@ -3,6 +3,7 @@
 import { Check } from 'lucide-react'
 
 import { useChat } from '@/components/chat/ChatContext'
+import { Reveal } from '@/components/Reveal'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,9 +19,8 @@ import { cn } from '@/lib/utils'
 const plans = [
   {
     id: 'free',
-    emoji: '🐝',
     name: 'Gratis',
-    tagline: 'Arma y prueba tu bot',
+    tagline: 'Arma y prueba tu asistente',
     price: 'Gratis',
     priceNote: 'sin tarjeta, sin caducidad',
     features: [
@@ -35,9 +35,8 @@ const plans = [
   },
   {
     id: 'premium',
-    emoji: '⭐',
     name: 'Premium',
-    tagline: 'Ponlo a trabajar de verdad',
+    tagline: 'Suéltalo a zumbar de verdad',
     price: 'Suscripción mensual',
     priceNote: 'se cotiza al armar tu bot, sin sorpresas',
     features: [
@@ -53,7 +52,6 @@ const plans = [
   },
   {
     id: 'enterprise',
-    emoji: '🏢',
     name: 'Enterprise',
     tagline: 'Lo hacemos contigo',
     price: 'A la medida',
@@ -74,37 +72,35 @@ export function PricingSection() {
   const { openChat } = useChat()
 
   return (
-    <section id="planes" className="scroll-mt-16 border-t bg-surface/40">
-      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-        <div className="mx-auto max-w-2xl text-center">
+    <section id="planes" className="scroll-mt-16">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+        <Reveal className="mx-auto max-w-2xl text-center">
           <p className="t-eyebrow">Planes</p>
-          <h2 className="mt-3 text-3xl font-bold sm:text-4xl">
+          <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">
             Empiezas gratis. Creces cuando tú quieras.
           </h2>
           <p className="mt-4 text-text-muted">
             El plan gratis funciona de verdad — no es un demo que caduca. Pagas
             cuando quieras conectar tu número real y abrir más canales.
           </p>
-        </div>
+        </Reveal>
 
         <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {plans.map((p) => (
+          {plans.map((p, i) => (
+            <Reveal key={p.id} delay={i * 80} className="flex">
             <Card
-              key={p.id}
               className={cn(
-                'flex flex-col',
-                p.highlight && 'relative border-accent/60 honey-glow'
+                'flex w-full flex-col',
+                p.highlight && 'honey-glow relative border-accent/40'
               )}
             >
               {p.highlight && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  El favorito de los negocios
+                  El favorito de la colmena
                 </Badge>
               )}
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <span aria-hidden>{p.emoji}</span> {p.name}
-                </CardTitle>
+                <CardTitle className="text-xl">{p.name}</CardTitle>
                 <CardDescription>{p.tagline}</CardDescription>
                 <p className="mt-3 font-display text-2xl font-bold text-text">{p.price}</p>
                 <p className="text-xs text-text-muted">{p.priceNote}</p>
@@ -129,6 +125,7 @@ export function PricingSection() {
                 </Button>
               </CardFooter>
             </Card>
+            </Reveal>
           ))}
         </div>
       </div>

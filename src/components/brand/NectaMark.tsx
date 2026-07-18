@@ -25,7 +25,7 @@ export function NectaWordmark({ className }: { className?: string }) {
   return (
     <span className={cn('inline-flex items-center gap-2', className)}>
       <NectaMark />
-      <span className="font-display text-xl font-bold tracking-tight text-text">
+      <span className="font-logo text-xl font-bold tracking-tight text-text">
         Necta<span className="text-accent">Core</span>
       </span>
     </span>

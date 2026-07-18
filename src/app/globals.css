@@ -2,53 +2,72 @@
 @import "tw-animate-css";
 
 /*
- * NectaCore / Abi design tokens — miel/ámbar sobre carbón.
+ * NectaCore / Abi design tokens — miel/ámbar sobre carbón cálido.
  * Dark es el tema por defecto; light es first-class vía [data-theme="light"].
- * Regla de la casa: nunca hardcodear fg/bg en componentes — siempre tokens.
+ * Reglas de la casa:
+ *  - nunca hardcodear fg/bg en componentes — siempre tokens.
+ *  - el ámbar es presupuesto escaso (~10% de la página): CTA, un acento en el
+ *    hero, hovers/focos y marcadores chicos. Todo lo demás, neutros cálidos.
+ *  - jerarquía por peso y por 3 niveles de texto, no por más tamaños.
  */
 
 @custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, :root:not([data-theme="light"]), :root:not([data-theme="light"]) *));
 
 :root {
-  /* carbón */
+  /* carbón cálido (matiz miel en los neutros) */
   --bg: oklch(0.1650 0.0080 75);
-  --surface: oklch(0.2050 0.0100 75);
-  --surface-raised: oklch(0.2450 0.0120 75);
-  --border: oklch(0.3050 0.0160 78);
+  --surface: oklch(0.1950 0.0100 75);
+  --surface-raised: oklch(0.2350 0.0120 75);
+  /* bordes por alfa, no por gris sólido: casi invisibles, solo estructura */
+  --border: oklch(1 0 0 / 8%);
+  --border-strong: oklch(1 0 0 / 14%);
 
-  /* crema */
+  /* crema — 3 niveles de texto */
   --text: oklch(0.9500 0.0180 85);
   --text-muted: oklch(0.7250 0.0200 80);
+  --text-faint: oklch(0.5400 0.0180 78);
 
   /* miel / ámbar */
-  --accent: oklch(0.7900 0.1550 75);
-  --accent-strong: oklch(0.8450 0.1650 80);
-  --accent-soft: oklch(0.7900 0.1550 75 / 12%);
+  --accent: oklch(0.7900 0.1500 75);
+  --accent-strong: oklch(0.8450 0.1600 80);
+  --accent-soft: oklch(0.7900 0.1500 75 / 12%);
+  --accent-glow: oklch(0.7900 0.1550 75 / 13%);
   --on-accent: oklch(0.2050 0.0300 75);
+
+  /* luz de canto superior para superficies elevadas (solo dark) */
+  --edge-light: oklch(1 0 0 / 6%);
+  --shadow-ambient: 0 8px 32px oklch(0 0 0 / 35%);
 
   /* estados */
   --success: oklch(0.7200 0.1300 130);
   --warn: oklch(0.6800 0.1500 50);
   --premium: oklch(0.6800 0.1100 290);
 
-  --radius: 0.75rem;
+  --radius: 1rem;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 [data-theme="light"] {
   --bg: oklch(0.9700 0.0120 85);
   --surface: oklch(0.9920 0.0060 85);
   --surface-raised: oklch(1 0 0);
-  --border: oklch(0.8800 0.0180 82);
+  --border: oklch(0.2 0.02 75 / 10%);
+  --border-strong: oklch(0.2 0.02 75 / 18%);
 
   --text: oklch(0.2250 0.0120 75);
   --text-muted: oklch(0.4600 0.0180 75);
+  --text-faint: oklch(0.6000 0.0160 75);
 
   /* ámbar profundo para AA sobre claro */
   --accent: oklch(0.5900 0.1300 70);
   --accent-strong: oklch(0.5200 0.1250 65);
   --accent-soft: oklch(0.5900 0.1300 70 / 12%);
+  --accent-glow: oklch(0.5900 0.1300 70 / 10%);
   --on-accent: oklch(0.9900 0.0100 85);
+
+  --edge-light: transparent;
+  --shadow-ambient: 0 8px 28px oklch(0 0 0 / 10%);
 
   --success: oklch(0.5500 0.1200 135);
   --warn: oklch(0.5600 0.1400 45);
@@ -62,6 +81,7 @@
   --color-surface-raised: var(--surface-raised);
   --color-text: var(--text);
   --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
   --color-accent-soft: var(--accent-soft);
@@ -86,23 +106,25 @@
   --color-accent-ui: var(--accent-soft);
   --color-destructive: var(--warn);
   --color-border: var(--border);
-  --color-input: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--border-strong);
   --color-ring: var(--accent);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display), var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-logo: var(--font-logo), var(--font-display), ui-sans-serif, system-ui, sans-serif;
 
-  --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-up: fade-up 0.7s var(--ease-out-expo) both;
   --animate-honey-pulse: honey-pulse 3.2s ease-in-out infinite;
 }
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -124,29 +146,59 @@
     color: var(--text);
     font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
   }
   ::selection { background: var(--accent); color: var(--on-accent); }
 }
 
 @layer utilities {
-  /* patrón de panal sutil (hexágonos), coloreado por currentColor del token */
+  /* patrón de panal sutil (hexágonos) — geometría de marca, nunca wallpaper */
   .honeycomb-bg {
     background-image: url("data:image/svg+xml,%3Csvg width='56' height='97' viewBox='0 0 56 97' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23b98a2e' stroke-opacity='0.55' stroke-width='1'%3E%3Cpath d='M28 17 L52 31 L52 63 L28 77 L4 63 L4 31 Z'/%3E%3Cpath d='M28 77 L52 91 M28 77 L4 91 M28 17 L28 -3'/%3E%3C/g%3E%3C/svg%3E");
     background-size: 56px 97px;
   }
+  /* la única fuente de luz ámbar de la página: un resplandor radial superior */
+  .hero-glow {
+    background: radial-gradient(ellipse 90% 65% at 50% -12%, var(--accent-glow), transparent 62%);
+  }
+  /* elevación premium: canto de luz arriba + sombra ambiental, sin glow de color */
+  .elev {
+    box-shadow: inset 0 1px 0 var(--edge-light), var(--shadow-ambient);
+  }
+  /* material de vidrio — solo para el nav */
+  .glass {
+    background: color-mix(in oklab, var(--bg) 78%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+  /* tarjeta destacada (pricing): borde ámbar tenue, sin resplandor */
   .honey-glow {
-    box-shadow: 0 0 40px -8px var(--accent-soft), 0 0 120px -24px var(--accent-soft);
+    box-shadow: inset 0 1px 0 var(--edge-light), var(--shadow-ambient),
+      0 0 0 1px var(--accent-soft);
   }
   .t-eyebrow {
-    font-size: 0.775rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--accent);
+  }
+
+  /* scroll reveal — se activa solo con JS (html.js), threshold en <Reveal/> */
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -157,4 +209,5 @@
     transition-duration: 0.01ms !important;
   }
   html { scroll-behavior: auto; }
+  .js .reveal { opacity: 1; transform: none; }
 }

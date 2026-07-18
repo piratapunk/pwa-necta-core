@@ -38,7 +38,7 @@ declare global {
 }
 
 const GREETING =
-  'Hola, soy Abi 🐝 En un ratito armamos tu asistente — y lo dejamos funcionando de verdad. ¿A qué se dedica tu negocio?'
+  'Hola, soy Abi 🐝 Cuéntame, ¿a qué se dedica tu negocio? En un ratito dejamos a tu asistente zumbando de verdad.'
 
 /* endowed progress: el panal nunca arranca vacío */
 const STAGE_CELLS: Record<Stage, number> = {

@@ -38,10 +38,10 @@ export default async function MisBotsPage() {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center sm:px-6">
         <AbiBee className="mx-auto block text-6xl" />
-        <h1 className="mt-6 text-2xl font-bold">Aquí viven tus bots</h1>
+        <h1 className="mt-6 text-2xl font-semibold">Aquí vivirá tu colmena</h1>
         <p className="mt-3 text-sm text-text-muted">
           Cuando armes tu asistente, Abi te manda un enlace de acceso a tu
-          correo — con ese enlace entras aquí y tu bot queda ligado a ti.
+          correo — con ese enlace entras aquí y tu asistente queda ligado a ti.
         </p>
         <Button className="mt-6" asChild>
           <Link href="/constructor">Arma tu asistente gratis</Link>
@@ -64,7 +64,7 @@ export default async function MisBotsPage() {
       <div className="flex items-center justify-between">
         <div>
           <p className="t-eyebrow">Tu colmena</p>
-          <h1 className="mt-1 text-3xl font-bold">Mis bots</h1>
+          <h1 className="mt-1 text-3xl font-semibold">Mis asistentes</h1>
         </div>
         <form action="/api/auth/signout" method="post">
           <Button variant="ghost" size="sm" type="submit">
