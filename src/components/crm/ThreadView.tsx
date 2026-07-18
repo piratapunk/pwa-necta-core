@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Bot, Send, UserRound } from 'lucide-react'
 
+import { ChatMarkdown } from '@/components/chat/ChatMarkdown'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -140,13 +141,13 @@ export function ThreadView({
           <div key={m.id} className={cn('flex flex-col', m.role === 'user' ? 'items-start' : 'items-end')}>
             <div
               className={cn(
-                'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap',
-                m.role === 'user' && 'rounded-bl-sm bg-surface-raised text-text',
+                'w-fit max-w-[90%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
+                m.role === 'user' && 'whitespace-pre-wrap rounded-bl-sm bg-surface-raised text-text',
                 m.role === 'assistant' && 'rounded-br-sm bg-accent-soft text-text',
-                m.role === 'owner' && 'rounded-br-sm bg-accent text-on-accent'
+                m.role === 'owner' && 'whitespace-pre-wrap rounded-br-sm bg-accent text-on-accent'
               )}
             >
-              {m.content}
+              {m.role === 'assistant' ? <ChatMarkdown text={m.content} /> : m.content}
             </div>
             <p className="mt-0.5 text-[10px] text-text-muted">
               {m.role === 'user' ? 'Cliente' : m.role === 'owner' ? 'Tú' : 'Asistente'}

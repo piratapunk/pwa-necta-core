@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Send } from 'lucide-react'
 
+import { ChatMarkdown } from '@/components/chat/ChatMarkdown'
 import { Linkify } from '@/components/chat/Linkify'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -180,13 +181,13 @@ export function TenantChat({
           <div key={m.id} className={cn(m.role !== 'user' && 'space-y-0.5')}>
             <div
               className={cn(
-                'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
+                'rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
                 m.role === 'user'
-                  ? 'ml-auto rounded-br-sm bg-accent text-on-accent'
-                  : 'rounded-bl-sm bg-surface-raised text-text'
+                  ? 'ml-auto max-w-[85%] w-fit whitespace-pre-wrap rounded-br-sm bg-accent text-on-accent'
+                  : 'w-fit max-w-full rounded-bl-sm bg-surface-raised text-text'
               )}
             >
-              <Linkify text={m.content} />
+              {m.role === 'user' ? <Linkify text={m.content} /> : <ChatMarkdown text={m.content} />}
             </div>
             {m.role === 'owner' && (
               <p className="text-[10px] text-text-muted">equipo de {botName}</p>
