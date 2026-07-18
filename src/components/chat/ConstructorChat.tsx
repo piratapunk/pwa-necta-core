@@ -435,16 +435,17 @@ export function ConstructorChat() {
       )}
 
       {upload && upload.phase !== 'uploading' && (
-        <div className="border-t bg-bg/60 p-3">
+        /* overlay: la revisión del documento no empuja el chat ni el cuestionario */
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-bg/70 p-4 backdrop-blur-[2px]">
           {upload.phase === 'error' ? (
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-warn/40 bg-surface p-3">
+            <div className="flex w-full max-w-md items-center justify-between gap-3 rounded-2xl border border-warn/40 bg-surface p-4 shadow-xl">
               <p className="text-xs text-warn">{upload.msg}</p>
               <Button size="sm" variant="ghost" onClick={() => setUpload(null)}>
                 Cerrar
               </Button>
             </div>
           ) : (
-            <div className="rounded-xl border border-accent/40 bg-surface p-3">
+            <div className="flex max-h-full w-full max-w-xl flex-col rounded-2xl border border-accent/40 bg-surface p-4 shadow-xl">
               <div className="flex items-center gap-2">
                 <FileText className="size-4 shrink-0 text-accent" />
                 <p className="min-w-0 truncate text-sm font-medium">{upload.filename}</p>
@@ -461,11 +462,10 @@ export function ConstructorChat() {
                 onChange={(e) =>
                   setUpload({ ...upload, text: e.target.value, chars: e.target.value.length })
                 }
-                rows={6}
-                className="mt-2 w-full resize-y rounded-lg border bg-bg px-3 py-2 font-mono text-xs text-text outline-none focus-visible:border-accent"
+                className="mt-2 min-h-40 w-full flex-1 resize-none rounded-lg border bg-bg px-3 py-2 font-mono text-xs leading-relaxed text-text outline-none focus-visible:border-accent"
                 aria-label="Contenido extraído del archivo"
               />
-              <div className="mt-2 flex gap-2">
+              <div className="mt-3 flex gap-2">
                 <Button size="sm" onClick={() => void resolveUpload('approve')}>
                   Se ve bien, agrégalo
                 </Button>
