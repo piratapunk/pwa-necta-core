@@ -250,7 +250,7 @@ export function ConstructorChat() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               builderSessionId: sidRef.current,
-              message: `[ARCHIVO] El dueño subió y aprobó "${safeName}" (${data.chars ?? 0} caracteres). Su contenido ya quedó guardado como información del negocio y se integrará al asistente al construirlo.`,
+              message: `[ARCHIVO] El dueño subió y aprobó "${safeName}" (${data.chars ?? 0} caracteres). Su contenido ya quedó guardado como información del negocio y se integrará al asistente al construirlo.${stage === 'afinado' || stage === 'construido' ? ' La personalidad ya está afinada — si el dueño aprueba, puedes construir.' : ''}`,
               _h: '',
             }),
           })
