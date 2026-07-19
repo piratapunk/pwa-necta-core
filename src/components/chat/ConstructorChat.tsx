@@ -151,7 +151,7 @@ export function ConstructorChat() {
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
-  }, [messages, busy])
+  }, [messages, busy, stage, tunerOpen])
 
   const renderTurnstile = useCallback(() => {
     if (tsRendered.current || !siteKey || !window.turnstile || !tsContainer.current) return
@@ -419,6 +419,47 @@ export function ConstructorChat() {
             Abi está trabajando…
           </div>
         )}
+
+        {(stage === 'borrador' || stage === 'afinado') && !tunerOpen && !busy && (
+          /* opciones dentro del flujo del chat (estilo panel de servicios):
+             que avance con un clic, sin leer de más ni teclear */
+          <div className="mx-auto w-full max-w-md space-y-2 pt-2">
+            {stage === 'borrador' ? (
+              <button
+                type="button"
+                onClick={() => setTunerOpen(true)}
+                className="w-full rounded-xl border border-accent bg-accent px-4 py-3 text-sm font-semibold text-on-accent transition-opacity hover:opacity-90"
+              >
+                Configurar personalidad ✨
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  disabled={upload?.phase === 'uploading'}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border bg-surface px-4 py-3 text-sm text-text transition-colors hover:border-accent/60 disabled:opacity-50"
+                >
+                  <Paperclip className="size-4 text-accent" /> Adjuntar menú o catálogo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void sendText('constrúyelo')}
+                  className="w-full rounded-xl border border-accent bg-accent px-4 py-3 text-sm font-semibold text-on-accent transition-opacity hover:opacity-90"
+                >
+                  Constrúyelo 🐝
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTunerOpen(true)}
+                  className="w-full rounded-xl border bg-surface px-4 py-3 text-sm text-text-muted transition-colors hover:border-accent/60 hover:text-text"
+                >
+                  Ajustar personalidad
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {tunerOpen && (
@@ -514,41 +555,7 @@ export function ConstructorChat() {
         </div>
       )}
 
-      {(stage === 'borrador' || stage === 'afinado') && !tunerOpen && !busy && (
-        /* acciones directas por etapa: que no tenga que leer ni teclear para avanzar */
-        <div className="flex flex-wrap items-center gap-2 border-t bg-bg/60 px-3 pt-3">
-          {stage === 'borrador' ? (
-            <Button size="sm" onClick={() => setTunerOpen(true)}>
-              Configurar personalidad ✨
-            </Button>
-          ) : (
-            <>
-              <Button
-                size="sm"
-                variant="secondary"
-                disabled={upload?.phase === 'uploading'}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Paperclip className="size-3.5" /> Adjuntar menú o catálogo
-              </Button>
-              <Button size="sm" onClick={() => void sendText('constrúyelo')}>
-                Constrúyelo 🐝
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => setTunerOpen(true)}>
-                Ajustar personalidad
-              </Button>
-            </>
-          )}
-        </div>
-      )}
-
-      <form
-        onSubmit={send}
-        className={cn(
-          'flex items-center gap-2 bg-bg/60 p-3',
-          !((stage === 'borrador' || stage === 'afinado') && !tunerOpen && !busy) && 'border-t'
-        )}
-      >
+      <form onSubmit={send} className="flex items-center gap-2 border-t bg-bg/60 p-3">
         <input
           ref={fileInputRef}
           type="file"
