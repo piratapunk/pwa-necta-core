@@ -119,7 +119,7 @@ export function PersonalityTuner({
   }
 
   return (
-    <div className="max-h-[45dvh] shrink-0 overflow-y-auto border-t bg-bg/50 px-4 py-4">
+    <div className="min-h-0 overflow-y-auto p-4">
       <div className="mb-3 flex items-center gap-2">
         <Sparkles className="size-4 text-accent" />
         <p className="text-sm font-semibold">

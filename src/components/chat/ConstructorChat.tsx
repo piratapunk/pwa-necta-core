@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Script from 'next/script'
-import { ExternalLink, FileText, Paperclip, Send } from 'lucide-react'
+import { ExternalLink, FileText, Paperclip, Send, X } from 'lucide-react'
 
 import { AbiBee } from '@/components/brand/AbiBee'
 import { Linkify } from '@/components/chat/Linkify'
@@ -108,7 +108,7 @@ export function ConstructorChat() {
   const [tsToken, setTsToken] = useState<string | null>(null)
   const [tsVerified, setTsVerified] = useState(false)
   const [upload, setUpload] = useState<Upload | null>(null)
-  const [tunerReopen, setTunerReopen] = useState(false)
+  const [tunerOpen, setTunerOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   /* overlay del reto: visible → fading (éxito, se desvanece) → hidden */
   const [tsOverlay, setTsOverlay] = useState<'visible' | 'fading' | 'hidden'>('visible')
@@ -421,23 +421,37 @@ export function ConstructorChat() {
         )}
       </div>
 
-      {(stage === 'borrador' || tunerReopen) && (
-        <PersonalityTuner
-          builderSessionId={sidRef.current}
-          onDone={() => {
-            setTunerReopen(false)
-            setStage('afinado')
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: crypto.randomUUID(),
-                role: 'assistant',
-                content:
-                  'Quedó con carácter propio ✨ Ya afiné cómo habla, qué persigue y qué hace cuando no sabe algo. ¿Le doy vida? Dime "constrúyelo" y lo pongo en línea.',
-              },
-            ])
-          }}
-        />
+      {tunerOpen && (
+        /* modal: el cuestionario no tapa la conversación — se abre cuando el
+           dueño ya leyó el mensaje y presiona el botón */
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-bg/70 p-4 backdrop-blur-[2px]">
+          <div className="relative flex max-h-full w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-accent/40 bg-surface shadow-xl">
+            <button
+              type="button"
+              aria-label="Cerrar"
+              onClick={() => setTunerOpen(false)}
+              className="absolute right-3 top-3 z-10 rounded-full p-1 text-text-muted transition-colors hover:bg-surface-raised hover:text-text"
+            >
+              <X className="size-4" />
+            </button>
+            <PersonalityTuner
+              builderSessionId={sidRef.current}
+              onDone={() => {
+                setTunerOpen(false)
+                setStage('afinado')
+                setMessages((prev) => [
+                  ...prev,
+                  {
+                    id: crypto.randomUUID(),
+                    role: 'assistant',
+                    content:
+                      'Quedó con carácter propio ✨ Ya afiné cómo habla, qué persigue y qué hace cuando no sabe algo.\n\n¿Tienes un menú, catálogo o lista de precios en un archivo? Adjúntalo y tu asistente se lo aprende — o constrúyelo de una vez.',
+                  },
+                ])
+              }}
+            />
+          </div>
+        </div>
       )}
 
       {upload && upload.phase !== 'uploading' && (
@@ -500,15 +514,31 @@ export function ConstructorChat() {
         </div>
       )}
 
-      {stage === 'afinado' && !tunerReopen && !busy && (
-        /* acciones directas: que no tenga que leer ni teclear para avanzar */
+      {(stage === 'borrador' || stage === 'afinado') && !tunerOpen && !busy && (
+        /* acciones directas por etapa: que no tenga que leer ni teclear para avanzar */
         <div className="flex flex-wrap items-center gap-2 border-t bg-bg/60 px-3 pt-3">
-          <Button size="sm" onClick={() => void sendText('constrúyelo')}>
-            Constrúyelo 🐝
-          </Button>
-          <Button size="sm" variant="secondary" onClick={() => setTunerReopen(true)}>
-            Ajustar personalidad
-          </Button>
+          {stage === 'borrador' ? (
+            <Button size="sm" onClick={() => setTunerOpen(true)}>
+              Configurar personalidad ✨
+            </Button>
+          ) : (
+            <>
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={upload?.phase === 'uploading'}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Paperclip className="size-3.5" /> Adjuntar menú o catálogo
+              </Button>
+              <Button size="sm" onClick={() => void sendText('constrúyelo')}>
+                Constrúyelo 🐝
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setTunerOpen(true)}>
+                Ajustar personalidad
+              </Button>
+            </>
+          )}
         </div>
       )}
 
@@ -516,7 +546,7 @@ export function ConstructorChat() {
         onSubmit={send}
         className={cn(
           'flex items-center gap-2 bg-bg/60 p-3',
-          !(stage === 'afinado' && !tunerReopen && !busy) && 'border-t'
+          !((stage === 'borrador' || stage === 'afinado') && !tunerOpen && !busy) && 'border-t'
         )}
       >
         <input
