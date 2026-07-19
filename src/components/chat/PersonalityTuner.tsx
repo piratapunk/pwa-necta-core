@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import { Loader2, Sparkles } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -177,7 +177,13 @@ export function PersonalityTuner({
                 : 'Elige una opción en cada punto.'}
         </p>
         <Button size="sm" onClick={submit} disabled={!complete || state === 'sending'}>
-          {state === 'sending' ? 'Afinando…' : 'Afinar personalidad ✨'}
+          {state === 'sending' ? (
+            <>
+              <Loader2 className="size-3.5 animate-spin" /> Afinando…
+            </>
+          ) : (
+            'Afinar personalidad ✨'
+          )}
         </Button>
       </div>
     </div>

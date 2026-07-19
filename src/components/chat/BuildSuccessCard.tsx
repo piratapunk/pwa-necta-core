@@ -58,9 +58,11 @@ export function BuildSuccessCard({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+    /* desktop: celebración+claim | pruébalo, LADO A LADO; móvil: apilado */
+    <div className="flex min-h-0 flex-1 animate-fade-in flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
+      <div className="flex flex-col lg:w-[44%] lg:overflow-y-auto lg:border-r">
       {/* celebración + liga */}
-      <div className="border-b bg-accent-soft px-6 py-6 text-center">
+      <div className="border-b bg-accent-soft px-6 py-6 text-center lg:border-b-0">
         <AbiBee className="mx-auto block text-5xl" />
         <h2 className="mt-3 font-display text-xl font-bold">
           ¡Tu asistente está vivo! 🎉
@@ -89,7 +91,7 @@ export function BuildSuccessCard({
       </div>
 
       {/* claim — siempre a la vista */}
-      <div className="border-b bg-bg/50 px-6 py-4">
+      <div className="border-b bg-bg/50 px-6 py-4 lg:border-b-0 lg:border-t">
         {claimState !== 'sent' ? (
           <>
             <p className="mb-2 flex items-center gap-2 text-sm font-semibold">
@@ -122,8 +124,10 @@ export function BuildSuccessCard({
         )}
       </div>
 
+      </div>
+
       {/* mini-chat de prueba embebido */}
-      <div className="flex min-h-[320px] flex-1 flex-col px-6 py-4">
+      <div className="flex min-h-[320px] flex-1 flex-col px-6 py-4 lg:min-h-0">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
           Pruébalo aquí mismo
         </p>

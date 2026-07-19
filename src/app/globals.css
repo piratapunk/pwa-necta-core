@@ -127,6 +127,8 @@
 
   --animate-fade-up: fade-up 0.7s var(--ease-out-expo) both;
   --animate-honey-pulse: honey-pulse 3.2s ease-in-out infinite;
+  --animate-pop-in: pop-in 0.25s var(--ease-out-expo) both;
+  --animate-fade-in: fade-in 0.2s ease both;
 }
 
 @keyframes fade-up {
@@ -137,6 +139,16 @@
 @keyframes honey-pulse {
   0%, 100% { opacity: 0.55; }
   50% { opacity: 1; }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes honey-fill {

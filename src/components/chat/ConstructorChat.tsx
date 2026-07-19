@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Script from 'next/script'
-import { ExternalLink, FileText, Paperclip, Send, X } from 'lucide-react'
+import { ExternalLink, FileText, Loader2, Paperclip, Send, X } from 'lucide-react'
 
 import { AbiBee } from '@/components/brand/AbiBee'
 import { Linkify } from '@/components/chat/Linkify'
@@ -423,7 +423,7 @@ export function ConstructorChat() {
         {(stage === 'borrador' || stage === 'afinado') && !tunerOpen && !busy && (
           /* opciones dentro del flujo del chat (estilo panel de servicios):
              que avance con un clic, sin leer de más ni teclear */
-          <div className="mx-auto w-full max-w-md space-y-2 pt-2">
+          <div className="mx-auto w-full max-w-md animate-pop-in space-y-2 pt-2">
             {stage === 'borrador' ? (
               <button
                 type="button"
@@ -438,9 +438,14 @@ export function ConstructorChat() {
                   type="button"
                   disabled={upload?.phase === 'uploading'}
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border bg-surface px-4 py-3 text-sm text-text transition-colors hover:border-accent/60 disabled:opacity-50"
+                  className="w-full rounded-xl border bg-surface px-4 py-3 text-sm text-text transition-colors hover:border-accent/60 disabled:opacity-50"
                 >
-                  <Paperclip className="size-4 text-accent" /> Adjuntar menú o catálogo
+                  <span className="flex items-center justify-center gap-2">
+                    <Paperclip className="size-4 text-accent" /> Adjuntar un archivo de tu negocio
+                  </span>
+                  <span className="mt-0.5 block text-xs text-text-muted">
+                    menú, catálogo, lista de precios o servicios…
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -465,8 +470,8 @@ export function ConstructorChat() {
       {tunerOpen && (
         /* modal: el cuestionario no tapa la conversación — se abre cuando el
            dueño ya leyó el mensaje y presiona el botón */
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-bg/70 p-4 backdrop-blur-[2px]">
-          <div className="relative flex max-h-full w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-accent/40 bg-surface shadow-xl">
+        <div className="absolute inset-0 z-10 flex animate-fade-in items-center justify-center bg-bg/70 p-4 backdrop-blur-[2px]">
+          <div className="relative flex max-h-full w-full max-w-xl animate-pop-in flex-col overflow-hidden rounded-2xl border border-accent/40 bg-surface shadow-xl">
             <button
               type="button"
               aria-label="Cerrar"
@@ -486,7 +491,7 @@ export function ConstructorChat() {
                     id: crypto.randomUUID(),
                     role: 'assistant',
                     content:
-                      'Quedó con carácter propio ✨ Ya afiné cómo habla, qué persigue y qué hace cuando no sabe algo.\n\n¿Tienes un menú, catálogo o lista de precios en un archivo? Adjúntalo y tu asistente se lo aprende — o constrúyelo de una vez.',
+                      'Quedó con carácter propio ✨ Ya afiné cómo habla, qué persigue y qué hace cuando no sabe algo.\n\n¿Tienes la información de tu negocio en algún archivo (menú, catálogo, lista de precios o de servicios)? Adjúntalo y tu asistente se lo aprende — o constrúyelo de una vez.',
                   },
                 ])
               }}
@@ -495,18 +500,27 @@ export function ConstructorChat() {
         </div>
       )}
 
-      {upload && upload.phase !== 'uploading' && (
+      {upload && (
         /* overlay: la revisión del documento no empuja el chat ni el cuestionario */
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-bg/70 p-4 backdrop-blur-[2px]">
-          {upload.phase === 'error' ? (
-            <div className="flex w-full max-w-md items-center justify-between gap-3 rounded-2xl border border-warn/40 bg-surface p-4 shadow-xl">
+        <div className="absolute inset-0 z-10 flex animate-fade-in items-center justify-center bg-bg/70 p-4 backdrop-blur-[2px]">
+          {upload.phase === 'uploading' ? (
+            <div className="flex animate-pop-in flex-col items-center gap-3 rounded-2xl border border-accent/40 bg-surface px-8 py-6 shadow-xl">
+              <Loader2 className="size-6 animate-spin text-accent" />
+              <p className="text-sm font-medium">Leyendo tu archivo…</p>
+              <p className="max-w-56 text-center text-xs text-text-muted">
+                Abi está extrayendo el texto de{' '}
+                <span className="text-text">{upload.filename}</span>
+              </p>
+            </div>
+          ) : upload.phase === 'error' ? (
+            <div className="flex w-full max-w-md animate-pop-in items-center justify-between gap-3 rounded-2xl border border-warn/40 bg-surface p-4 shadow-xl">
               <p className="text-xs text-warn">{upload.msg}</p>
               <Button size="sm" variant="ghost" onClick={() => setUpload(null)}>
                 Cerrar
               </Button>
             </div>
           ) : (
-            <div className="flex max-h-full w-full max-w-xl flex-col rounded-2xl border border-accent/40 bg-surface p-4 shadow-xl">
+            <div className="flex max-h-full w-full max-w-xl animate-pop-in flex-col rounded-2xl border border-accent/40 bg-surface p-4 shadow-xl">
               <div className="flex items-center gap-2">
                 <FileText className="size-4 shrink-0 text-accent" />
                 <p className="min-w-0 truncate text-sm font-medium">{upload.filename}</p>
@@ -568,8 +582,8 @@ export function ConstructorChat() {
           type="button"
           size="icon"
           variant="ghost"
-          aria-label="Subir menú o catálogo"
-          title="Sube tu menú, catálogo o lista de precios (PDF, Word, TXT, CSV)"
+          aria-label="Adjuntar un archivo de tu negocio"
+          title="Adjunta un archivo con información de tu negocio: menú, catálogo, precios, servicios… (PDF, Word, TXT, CSV)"
           disabled={busy || upload?.phase === 'uploading' || (!tsVerified && !!siteKey && !tsToken)}
           onClick={() => fileInputRef.current?.click()}
         >
