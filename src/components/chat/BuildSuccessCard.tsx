@@ -60,7 +60,7 @@ export function BuildSuccessCard({
   return (
     /* desktop: celebración+claim | pruébalo, LADO A LADO; móvil: apilado */
     <div className="flex min-h-0 flex-1 animate-fade-in flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
-      <div className="flex flex-col lg:w-[44%] lg:overflow-y-auto lg:border-r">
+      <div className="flex flex-col lg:w-[44%] lg:justify-center lg:overflow-y-auto lg:border-r">
       {/* celebración + liga */}
       <div className="border-b bg-accent-soft px-6 py-6 text-center lg:border-b-0">
         <AbiBee className="mx-auto block text-5xl" />
@@ -75,7 +75,7 @@ export function BuildSuccessCard({
             href={botUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 truncate rounded-lg border bg-surface px-3 py-2 text-sm font-semibold text-accent hover:underline"
+            className="flex-1 break-all rounded-lg border bg-surface px-3 py-2 text-sm font-semibold text-accent hover:underline"
           >
             {prettyUrl}
           </a>

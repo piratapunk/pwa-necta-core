@@ -352,7 +352,13 @@ export function ConstructorChat() {
   }
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden rounded-2xl border bg-surface">
+    /* la ventana se expande cuando el bot ya vive (éxito en dos columnas) */
+    <div
+      className={cn(
+        'relative mx-auto flex w-full flex-1 flex-col overflow-hidden rounded-2xl border bg-surface transition-[max-width] duration-500',
+        botUrl || building ? 'max-w-5xl' : 'max-w-2xl'
+      )}
+    >
       {siteKey && (
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js"

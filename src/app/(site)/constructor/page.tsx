@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function ConstructorPage() {
   return (
-    <div className="mx-auto flex h-[calc(100dvh-4rem)] max-w-2xl flex-col px-4 py-8 sm:px-6">
+    <div className="mx-auto flex h-[calc(100dvh-4rem)] max-w-5xl flex-col px-4 py-8 sm:px-6">
       <div className="mb-6 text-center">
         <p className="t-eyebrow">El Constructor</p>
         <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">
