@@ -32,7 +32,7 @@ export function ConfirmLogin() {
         setState('error')
         return
       }
-      window.location.replace(data.redirect ?? '/mis-bots')
+      window.location.replace(data.redirect ?? '/inicio')
     } catch {
       setState('error')
     }

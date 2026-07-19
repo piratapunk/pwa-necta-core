@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   }
 
   /* con un solo bot, directo a su panel; si no, a la lista */
-  let redirect = '/mis-bots'
+  let redirect = '/inicio'
   if (sql) {
     try {
       const rows = await sql`select abi.user_tenants(${data.user.id}::uuid) as t`

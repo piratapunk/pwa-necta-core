@@ -44,5 +44,5 @@ export async function GET(req: NextRequest) {
       }
     } catch {}
   }
-  return NextResponse.redirect(`${origin}/mis-bots`)
+  return NextResponse.redirect(`${origin}/inicio`)
 }

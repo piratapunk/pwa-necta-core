@@ -83,30 +83,30 @@ export function PanelNav({
   )
 }
 
+const PORTAL_ITEMS = [
+  { href: '/inicio', label: 'Inicio', icon: Home },
+  { href: '/mis-bots', label: 'Mis asistentes', icon: Boxes },
+]
+
 export function MisBotsNav() {
   const pathname = usePathname()
-  const active = pathname === '/mis-bots'
   return (
     <nav className="mt-6 flex flex-col gap-1">
-      <Link
-        href="/"
-        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-raised hover:text-text"
-      >
-        <Home className="size-4" />
-        Inicio
-      </Link>
-      <Link
-        href="/mis-bots"
-        className={cn(
-          'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors',
-          active
-            ? 'bg-accent-soft font-medium text-accent'
-            : 'text-text-muted hover:bg-surface-raised hover:text-text'
-        )}
-      >
-        <Boxes className="size-4" />
-        Mis asistentes
-      </Link>
+      {PORTAL_ITEMS.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(
+            'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors',
+            pathname === item.href
+              ? 'bg-accent-soft font-medium text-accent'
+              : 'text-text-muted hover:bg-surface-raised hover:text-text'
+          )}
+        >
+          <item.icon className="size-4" />
+          {item.label}
+        </Link>
+      ))}
     </nav>
   )
 }

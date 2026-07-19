@@ -35,7 +35,7 @@ export default async function PanelLayout({
   return (
     <div className="flex min-h-dvh">
       <aside className="hidden w-60 shrink-0 flex-col border-r bg-surface/60 p-4 md:flex">
-        <Link href="/" className="px-2">
+        <Link href="/inicio" className="px-2">
           <NectaWordmark />
         </Link>
         <Link

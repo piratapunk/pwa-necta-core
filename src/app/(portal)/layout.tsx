@@ -37,7 +37,7 @@ export default async function MisBotsLayout({
   return (
     <div className="flex min-h-dvh">
       <aside className="hidden w-60 shrink-0 flex-col border-r bg-surface/60 p-4 md:flex">
-        <Link href="/mis-bots" className="px-2">
+        <Link href="/inicio" className="px-2">
           <NectaWordmark />
         </Link>
 
@@ -81,7 +81,7 @@ export default async function MisBotsLayout({
       <div className="flex-1">
         <div className="border-b bg-surface/40 px-4 py-3 md:hidden">
           <div className="flex items-center justify-between">
-            <Link href="/mis-bots">
+            <Link href="/inicio">
               <NectaWordmark />
             </Link>
             <form action="/api/auth/signout" method="post">

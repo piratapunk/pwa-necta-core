@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Boxes, LogOut, Settings } from 'lucide-react'
+import { Boxes, Home, LogOut, Settings } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
@@ -35,6 +35,13 @@ export function UserMenu({
             <p className="truncate border-b px-3.5 py-2.5 text-xs text-text-muted">
               {email || 'tu cuenta'}
             </p>
+            <Link
+              href="/inicio"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-text transition-colors hover:bg-surface-raised"
+            >
+              <Home className="size-4 text-text-muted" /> Inicio
+            </Link>
             <Link
               href="/mis-bots"
               onClick={() => setOpen(false)}
