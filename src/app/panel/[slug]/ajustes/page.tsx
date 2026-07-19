@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Bot, CreditCard, LogOut, UserRound } from 'lucide-react'
+import { Bot, CreditCard, LogOut, Palette, UserRound } from 'lucide-react'
 
+import { ThemePicker } from '@/components/panel/ThemePicker'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { getAuthUser } from '@/lib/auth/server'
@@ -14,6 +15,7 @@ const SECTIONS = [
   { key: 'cuenta', label: 'Cuenta', hint: 'Perfil, acceso y sesión', icon: UserRound },
   { key: 'suscripcion', label: 'Suscripción', hint: 'Plan y facturación', icon: CreditCard },
   { key: 'asistente', label: 'Asistente', hint: 'Nombre, dirección y personalidad', icon: Bot },
+  { key: 'apariencia', label: 'Apariencia', hint: 'Tema claro u oscuro', icon: Palette },
 ] as const
 
 type Overview = {
@@ -194,6 +196,18 @@ export default async function PanelAjustes({
               <p className="px-4 py-3.5 text-xs text-text-muted">
                 Muy pronto: editar saludo, tono y respuestas desde aquí, con cambios al instante.
               </p>
+            </div>
+          )}
+
+          {section === 'apariencia' && (
+            <div className="rounded-2xl border bg-surface p-4">
+              <p className="text-sm font-semibold">Tema</p>
+              <p className="mt-0.5 text-xs text-text-muted">
+                Cómo se ve NectaCore en este dispositivo.
+              </p>
+              <div className="mt-4">
+                <ThemePicker />
+              </div>
             </div>
           )}
         </div>

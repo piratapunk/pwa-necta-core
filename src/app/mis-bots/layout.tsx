@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Boxes, Plus } from 'lucide-react'
+import { Boxes, Plus, Settings } from 'lucide-react'
 
 import { NectaWordmark } from '@/components/brand/NectaMark'
 import { UserMenu } from '@/components/panel/UserMenu'
@@ -47,6 +47,13 @@ export default async function MisBotsLayout({
             <Boxes className="size-4" />
             Mis asistentes
           </Link>
+          <Link
+            href="/mis-bots/cuenta"
+            className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-raised hover:text-text"
+          >
+            <Settings className="size-4" />
+            Configuración
+          </Link>
         </nav>
 
         {tenants.length > 0 && (
@@ -80,7 +87,7 @@ export default async function MisBotsLayout({
         </Link>
 
         <div className="mt-auto pt-6">
-          <UserMenu email={user.email} />
+          <UserMenu email={user.email} settingsHref="/mis-bots/cuenta" />
         </div>
       </aside>
 
