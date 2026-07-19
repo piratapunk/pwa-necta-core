@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { Plus } from 'lucide-react'
 
 import { NectaWordmark } from '@/components/brand/NectaMark'
+import { BackButton } from '@/components/panel/BackButton'
 import { MisBotsNav } from '@/components/panel/PanelNav'
 import { UserMenu } from '@/components/panel/UserMenu'
 import { Badge } from '@/components/ui/badge'
@@ -90,7 +91,10 @@ export default async function MisBotsLayout({
             </form>
           </div>
         </div>
-        <main className="p-5 sm:p-8">{children}</main>
+        <main className="p-5 sm:p-8">
+          <BackButton className="mb-5" />
+          {children}
+        </main>
       </div>
     </div>
   )

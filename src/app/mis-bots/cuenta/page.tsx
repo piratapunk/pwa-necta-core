@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { CreditCard, LogOut, Palette, UserRound } from 'lucide-react'
 
-import { BackButton } from '@/components/panel/BackButton'
 import { ThemePicker } from '@/components/panel/ThemePicker'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -67,7 +66,6 @@ export default async function CuentaPage({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <BackButton className="mb-5" />
       <p className="t-eyebrow">Centro de administración</p>
       <h1 className="mt-1 text-2xl font-semibold">Configuración de tu cuenta</h1>
 

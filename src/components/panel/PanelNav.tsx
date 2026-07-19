@@ -89,6 +89,13 @@ export function MisBotsNav() {
   return (
     <nav className="mt-6 flex flex-col gap-1">
       <Link
+        href="/"
+        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-raised hover:text-text"
+      >
+        <Home className="size-4" />
+        Inicio
+      </Link>
+      <Link
         href="/mis-bots"
         className={cn(
           'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors',
