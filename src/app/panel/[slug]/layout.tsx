@@ -1,37 +1,14 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import {
-  BarChart3,
-  Filter,
-  FolderOpen,
-  Home,
-  MessageSquare,
-  Plug,
-  Settings,
-  Sparkles,
-  UsersRound,
-} from 'lucide-react'
-
 import { NectaWordmark } from '@/components/brand/NectaMark'
 import { BackButton } from '@/components/panel/BackButton'
+import { PanelNav } from '@/components/panel/PanelNav'
 import { UserMenu } from '@/components/panel/UserMenu'
 import { Badge } from '@/components/ui/badge'
 import { getAuthUser } from '@/lib/auth/server'
 import { getSql } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
-
-const nav = [
-  { href: '', label: 'Resumen', icon: Home },
-  { href: '/conversaciones', label: 'Conversaciones', icon: MessageSquare },
-  { href: '/clientes', label: 'Clientes', icon: UsersRound },
-  { href: '/embudo', label: 'Embudo', icon: Filter },
-  { href: '/archivos', label: 'Archivos y memoria', icon: FolderOpen },
-  { href: '/conexiones', label: 'Conexiones', icon: Plug },
-  { href: '/funciones', label: 'Funciones a la medida', icon: Sparkles },
-  { href: '/plan', label: 'Mi plan', icon: BarChart3 },
-  { href: '/ajustes', label: 'Configuración', icon: Settings },
-]
 
 export default async function PanelLayout({
   children,
@@ -71,18 +48,7 @@ export default async function PanelLayout({
             {tenant.plan}
           </Badge>
         </Link>
-        <nav className="mt-6 flex flex-col gap-1">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={`/panel/${slug}${item.href}`}
-              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-raised hover:text-text"
-            >
-              <item.icon className="size-4" />
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <PanelNav slug={slug} />
         <div className="mt-auto pt-6">
           <UserMenu email={user.email} settingsHref={`/panel/${slug}/ajustes`} />
         </div>
@@ -96,17 +62,7 @@ export default async function PanelLayout({
               Mis bots
             </Link>
           </div>
-          <div className="mt-2 flex gap-3 overflow-x-auto text-xs">
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={`/panel/${slug}${item.href}`}
-                className="whitespace-nowrap text-text-muted"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
+          <PanelNav slug={slug} variant="mobile" />
         </div>
         <main className="p-5 sm:p-8">
           <BackButton className="mb-5" />

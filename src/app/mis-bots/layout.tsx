@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Boxes, Plus, Settings } from 'lucide-react'
+import { Plus } from 'lucide-react'
 
 import { NectaWordmark } from '@/components/brand/NectaMark'
+import { MisBotsNav } from '@/components/panel/PanelNav'
 import { UserMenu } from '@/components/panel/UserMenu'
 import { Badge } from '@/components/ui/badge'
 import { getAuthUser } from '@/lib/auth/server'
@@ -39,22 +40,7 @@ export default async function MisBotsLayout({
           <NectaWordmark />
         </Link>
 
-        <nav className="mt-6 flex flex-col gap-1">
-          <Link
-            href="/mis-bots"
-            className="flex items-center gap-2.5 rounded-lg bg-accent-soft px-3 py-2 text-sm font-medium text-accent"
-          >
-            <Boxes className="size-4" />
-            Mis asistentes
-          </Link>
-          <Link
-            href="/mis-bots/cuenta"
-            className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-raised hover:text-text"
-          >
-            <Settings className="size-4" />
-            Configuración
-          </Link>
-        </nav>
+        <MisBotsNav />
 
         {tenants.length > 0 && (
           <div className="mt-6">
