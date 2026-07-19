@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 
 import { NectaWordmark } from '@/components/brand/NectaMark'
+import { BackButton } from '@/components/panel/BackButton'
 import { UserMenu } from '@/components/panel/UserMenu'
 import { Badge } from '@/components/ui/badge'
 import { getAuthUser } from '@/lib/auth/server'
@@ -107,7 +108,10 @@ export default async function PanelLayout({
             ))}
           </div>
         </div>
-        <main className="p-5 sm:p-8">{children}</main>
+        <main className="p-5 sm:p-8">
+          <BackButton className="mb-5" />
+          {children}
+        </main>
       </div>
     </div>
   )

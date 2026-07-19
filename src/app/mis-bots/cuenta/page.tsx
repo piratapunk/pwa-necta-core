@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { CreditCard, LogOut, Palette, UserRound } from 'lucide-react'
 
+import { BackButton } from '@/components/panel/BackButton'
 import { ThemePicker } from '@/components/panel/ThemePicker'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -30,6 +31,8 @@ type TenantRow = {
   status: string
 }
 
+type PlanLimits = { plan: string; msgs_day: number; files_max: number; rag_enabled: boolean }
+
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b px-4 py-3.5 text-sm last:border-b-0">
@@ -52,15 +55,19 @@ export default async function CuentaPage({
 
   const sql = getSql()
   let tenants: TenantRow[] = []
+  let limits: Record<string, PlanLimits> = {}
   if (sql) {
     try {
       const rows = await sql`select abi.user_tenants(${user.id}::uuid) as t`
       tenants = (rows[0]?.t as TenantRow[]) ?? []
+      const pl = await sql`select plan, msgs_day, files_max, rag_enabled from abi.plan_limits`
+      limits = Object.fromEntries((pl as unknown as PlanLimits[]).map((p) => [p.plan, p]))
     } catch {}
   }
 
   return (
     <div className="mx-auto max-w-4xl">
+      <BackButton className="mb-5" />
       <p className="t-eyebrow">Centro de administración</p>
       <h1 className="mt-1 text-2xl font-semibold">Configuración de tu cuenta</h1>
 
@@ -140,27 +147,32 @@ export default async function CuentaPage({
                   .
                 </div>
               )}
-              {tenants.map((t) => (
-                <div
-                  key={t.slug}
-                  className="flex items-center justify-between gap-4 rounded-2xl border bg-surface px-4 py-3.5"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{t.name}</p>
-                    <p className="mt-0.5 text-xs text-text-muted">
-                      {t.status === 'active' ? 'en línea' : t.status}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2.5">
-                    <Badge variant={t.plan === 'free' ? 'soft' : 'premium'}>{t.plan}</Badge>
-                    <Button size="sm" variant="secondary" asChild>
+              {tenants.map((t) => {
+                const l = limits[t.plan]
+                return (
+                  <div
+                    key={t.slug}
+                    className="flex items-center justify-between gap-4 rounded-2xl border bg-surface px-4 py-3.5"
+                  >
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-2 text-sm font-medium">
+                        <span className="truncate">{t.name}</span>
+                        <Badge variant={t.plan === 'free' ? 'soft' : 'premium'}>{t.plan}</Badge>
+                      </p>
+                      <p className="mt-0.5 text-xs text-text-muted">
+                        {t.status === 'active' ? 'en línea' : t.status}
+                        {l &&
+                          ` · ${l.msgs_day.toLocaleString('es-MX')} mensajes/día · ${l.files_max} archivo${l.files_max === 1 ? '' : 's'}${l.rag_enabled ? ' · búsqueda avanzada' : ''}`}
+                      </p>
+                    </div>
+                    <Button size="sm" variant="secondary" className="shrink-0" asChild>
                       <Link href={`/panel/${t.slug}/plan`}>
                         {t.plan === 'free' ? 'Mejorar' : 'Facturación'}
                       </Link>
                     </Button>
                   </div>
-                </div>
-              ))}
+                )
+              })}
               <p className="px-1 text-xs text-text-muted">
                 Cada asistente tiene su propio plan — así pagas solo por el que lo necesita.
               </p>
