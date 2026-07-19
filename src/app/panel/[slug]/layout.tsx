@@ -7,14 +7,15 @@ import {
   Home,
   MessageSquare,
   Plug,
+  Settings,
   Sparkles,
   UsersRound,
 } from 'lucide-react'
 
 import { NectaWordmark } from '@/components/brand/NectaMark'
+import { UserMenu } from '@/components/panel/UserMenu'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { getAuthUserId } from '@/lib/auth/server'
+import { getAuthUser } from '@/lib/auth/server'
 import { getSql } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
@@ -28,6 +29,7 @@ const nav = [
   { href: '/conexiones', label: 'Conexiones', icon: Plug },
   { href: '/funciones', label: 'Funciones a la medida', icon: Sparkles },
   { href: '/plan', label: 'Mi plan', icon: BarChart3 },
+  { href: '/ajustes', label: 'Configuración', icon: Settings },
 ]
 
 export default async function PanelLayout({
@@ -38,8 +40,9 @@ export default async function PanelLayout({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const userId = await getAuthUserId()
-  if (!userId) redirect('/mis-bots')
+  const user = await getAuthUser()
+  if (!user) redirect('/entrar')
+  const userId = user.id
 
   const sql = getSql()
   if (!sql) notFound()
@@ -75,15 +78,8 @@ export default async function PanelLayout({
             </Link>
           ))}
         </nav>
-        <div className="mt-auto flex flex-col gap-2 pt-6">
-          <Button variant="secondary" size="sm" asChild>
-            <Link href="/mis-bots">Mis bots</Link>
-          </Button>
-          <form action="/api/auth/signout" method="post">
-            <Button variant="ghost" size="sm" type="submit" className="w-full">
-              Salir
-            </Button>
-          </form>
+        <div className="mt-auto pt-6">
+          <UserMenu email={user.email} settingsHref={`/panel/${slug}/ajustes`} />
         </div>
       </aside>
 

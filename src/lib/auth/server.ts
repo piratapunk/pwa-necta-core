@@ -42,6 +42,18 @@ export async function getAuthUserId(): Promise<string | null> {
   }
 }
 
+export async function getAuthUser(): Promise<{ id: string; email: string } | null> {
+  try {
+    const supabase = await createAuthClient()
+    const { data } = await supabase.auth.getClaims()
+    const id = data?.claims?.sub as string | undefined
+    if (!id) return null
+    return { id, email: (data?.claims?.email as string) ?? '' }
+  } catch {
+    return null
+  }
+}
+
 /* request.url miente detrás de Traefik (gotcha heredado de bjj) */
 export async function getAppOrigin(): Promise<string> {
   const envUrl = process.env.NEXT_PUBLIC_SITE_URL
