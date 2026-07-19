@@ -16,10 +16,20 @@ export function LoginForm() {
     if (!email.trim() || state === 'sending') return
     setState('sending')
     try {
+      /* red de seguridad: si este navegador construyó un bot y quedó sin
+         reclamar, el login normal también lo liga */
+      let builderSessionId: string | null = null
+      try {
+        builderSessionId = localStorage.getItem('necta_builder_session')
+      } catch {}
       const res = await fetch('/api/auth/request-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), _h: '' }),
+        body: JSON.stringify({
+          email: email.trim(),
+          ...(builderSessionId ? { builderSessionId } : {}),
+          _h: '',
+        }),
       })
       setState(res.ok ? 'sent' : 'error')
     } catch {

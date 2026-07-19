@@ -44,7 +44,8 @@ export async function POST(req: NextRequest) {
   }
 
   const origin = await getAppOrigin()
-  const url = new URL(`${origin}/api/auth/callback`)
+  /* página de confirmación (verifica por POST): a prueba del prefetch del correo */
+  const url = new URL(`${origin}/entrar/confirmar`)
   url.searchParams.set('token_hash', link.token_hash)
   url.searchParams.set('type', link.type)
   if (body.builderSessionId) url.searchParams.set('bs', body.builderSessionId)
