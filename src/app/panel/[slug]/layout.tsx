@@ -60,12 +60,16 @@ export default async function PanelLayout({
         <Link href="/" className="px-2">
           <NectaWordmark />
         </Link>
-        <div className="mt-6 rounded-lg border bg-surface px-3 py-2.5">
+        <Link
+          href="/mis-bots"
+          title="Cambiar de asistente"
+          className="mt-6 block rounded-lg border bg-surface px-3 py-2.5 transition-colors hover:bg-surface-raised"
+        >
           <p className="truncate text-sm font-semibold">{tenant.name}</p>
           <Badge variant={tenant.plan === 'free' ? 'soft' : 'premium'} className="mt-1">
             {tenant.plan}
           </Badge>
-        </div>
+        </Link>
         <nav className="mt-6 flex flex-col gap-1">
           {nav.map((item) => (
             <Link

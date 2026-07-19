@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ExternalLink, Plus } from 'lucide-react'
 
-import { UserMenu } from '@/components/panel/UserMenu'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -46,16 +45,12 @@ export default async function MisBotsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="t-eyebrow">Tu colmena</p>
-          <h1 className="mt-1 text-3xl font-semibold">Mis asistentes</h1>
-        </div>
-        <div className="w-60">
-          <UserMenu email={user.email} />
-        </div>
-      </div>
+    <div className="mx-auto max-w-4xl">
+      <p className="t-eyebrow">Tu colmena</p>
+      <h1 className="mt-1 text-2xl font-semibold">Mis asistentes</h1>
+      <p className="mt-1 text-sm text-text-muted">
+        Cada asistente atiende su negocio con su propia dirección y su propio CRM.
+      </p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {tenants.map((t) => (
