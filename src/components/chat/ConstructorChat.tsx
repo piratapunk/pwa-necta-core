@@ -103,6 +103,7 @@ export function ConstructorChat() {
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
   const [botUrl, setBotUrl] = useState<string | null>(null)
+  const [claimed, setClaimed] = useState(false)
   const [building, setBuilding] = useState(false)
   const [stage, setStage] = useState<Stage>('inicio')
   const [tsToken, setTsToken] = useState<string | null>(null)
@@ -300,6 +301,7 @@ export function ConstructorChat() {
         error?: string
         provisioned?: { subdomain?: string } | null
         stage?: Stage
+        claimed?: boolean
       }
       if (res.status === 403 && data.error?.startsWith('turnstile')) {
         setTsVerified(false)
@@ -333,6 +335,7 @@ export function ConstructorChat() {
         try {
           localStorage.setItem(`necta_built_${sidRef.current}`, url)
         } catch {}
+        if (data.claimed) setClaimed(true)
         setBuilding(true)
         pendingUrlRef.current = url
       }
@@ -400,6 +403,7 @@ export function ConstructorChat() {
             .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
             .join(' ')}
           builderSessionId={sidRef.current}
+          claimed={claimed}
         />
       ) : (
         <>

@@ -94,6 +94,32 @@ export async function getWhatsAppConnectUrl(
   }
 }
 
+/* las cuentas de coexistencia aterrizan en el perfil default del usuario del
+   canal — se mueven al perfil del tenant para que su inbox quede aislado */
+export async function moveAccountToProfile(
+  accountId: string,
+  profileId: string
+): Promise<boolean> {
+  const headers = authHeaders()
+  if (!headers) return false
+  try {
+    const res = await fetch(`${BASE}/accounts/${encodeURIComponent(accountId)}`, {
+      method: 'PATCH',
+      headers,
+      signal: AbortSignal.timeout(15_000),
+      body: JSON.stringify({ profileId }),
+    })
+    if (!res.ok) {
+      console.error('[zernio] move account status', res.status, (await res.text()).slice(0, 200))
+      return false
+    }
+    return true
+  } catch (err) {
+    console.error('[zernio] move account error', err)
+    return false
+  }
+}
+
 export async function sendInboxMessage(
   conversationId: string,
   text: string

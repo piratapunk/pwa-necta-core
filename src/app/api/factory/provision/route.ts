@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
+import { getAuthUserId } from '@/lib/auth/server'
 import { getSql } from '@/lib/db'
 import { botSpecSchema } from '@/lib/factory/spec'
 import { clientIp, hasAllowedOrigin, rateLimit } from '@/lib/security'
@@ -70,11 +71,21 @@ export async function POST(req: NextRequest) {
     if (!result?.ok) {
       return NextResponse.json({ error: 'provision_failed' }, { status: 500 })
     }
+    /* con sesión iniciada, el bot queda ligado al dueño sin pedir correo */
+    let claimed = false
+    try {
+      const userId = await getAuthUserId()
+      if (userId) {
+        await sql`select abi.claim_tenant(${body.builderSessionId}::uuid, ${userId}::uuid)`
+        claimed = true
+      }
+    } catch {}
     return NextResponse.json({
       ok: true,
       slug: result.slug,
       subdomain: result.subdomain,
       url: `https://${result.subdomain}`,
+      claimed,
     })
   } catch (err) {
     try {

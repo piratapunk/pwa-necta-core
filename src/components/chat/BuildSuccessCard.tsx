@@ -17,10 +17,12 @@ export function BuildSuccessCard({
   botUrl,
   botName,
   builderSessionId,
+  claimed = false,
 }: {
   botUrl: string
   botName: string
   builderSessionId: string
+  claimed?: boolean
 }) {
   const [copied, setCopied] = useState(false)
   const [claimEmail, setClaimEmail] = useState('')
@@ -90,9 +92,18 @@ export function BuildSuccessCard({
         </div>
       </div>
 
-      {/* claim — siempre a la vista */}
+      {/* claim — siempre a la vista (o el acceso directo si ya hay sesión) */}
       <div className="border-b bg-bg/50 px-6 py-4 lg:border-b-0 lg:border-t">
-        {claimState !== 'sent' ? (
+        {claimed ? (
+          <div className="text-center">
+            <p className="text-sm text-text-muted">
+              Ya quedó ligado a tu cuenta ✓
+            </p>
+            <Button className="mt-3" asChild>
+              <a href={`/panel/${slug}`}>Ir a su panel</a>
+            </Button>
+          </div>
+        ) : claimState !== 'sent' ? (
           <>
             <p className="mb-2 flex items-center gap-2 text-sm font-semibold">
               <Mail className="size-4 text-accent" /> Hazlo tuyo — para

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { getAppOrigin } from '@/lib/auth/server'
 import { getSql } from '@/lib/db'
-import { verifyConnectState } from '@/lib/zernio'
+import { moveAccountToProfile, verifyConnectState } from '@/lib/zernio'
 
 /*
  * Regreso del Embedded Signup de Meta:
@@ -23,8 +23,11 @@ export async function GET(req: NextRequest) {
   const sql = getSql()
   if (!sql) return NextResponse.redirect(`${dest}?connected=0`)
 
-  const rows = await sql`select id from abi.tenants where slug = ${slug}`
+  const rows = await sql`
+    select id, channel_profile_id from abi.tenants where slug = ${slug}
+  `
   const tenantId = rows[0]?.id as string | undefined
+  const tenantProfileId = rows[0]?.channel_profile_id as string | null | undefined
   if (!tenantId) return NextResponse.redirect(`${origin}/mis-bots`)
 
   if (p.get('connected') === 'whatsapp' && accountId) {
@@ -32,6 +35,11 @@ export async function GET(req: NextRequest) {
       select abi.set_tenant_channel(
         ${tenantId}::uuid, 'connected', null, ${accountId}, ${number})
     `
+    /* la coexistencia deja la cuenta en el perfil default del canal:
+       moverla al perfil propio del tenant (best-effort, no bloquea) */
+    if (tenantProfileId) {
+      await moveAccountToProfile(accountId, tenantProfileId)
+    }
     return NextResponse.redirect(`${dest}?connected=1`)
   }
 

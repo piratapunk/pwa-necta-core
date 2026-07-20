@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
+import { getAuthUserId } from '@/lib/auth/server'
+import { getSql } from '@/lib/db'
 import { signPayload } from '@/lib/factory/hmac'
 import {
   clientIp,
@@ -103,11 +105,25 @@ export async function POST(req: NextRequest) {
       stage?: string
       turns?: number
     }
+    /* si el dueño ya tiene sesión, el bot recién construido queda ligado
+       a su cuenta sin pedirle el correo otra vez */
+    let claimed = false
+    if (data.provisioned?.subdomain) {
+      try {
+        const userId = await getAuthUserId()
+        const sql = getSql()
+        if (userId && sql) {
+          await sql`select abi.claim_tenant(${body.builderSessionId}::uuid, ${userId}::uuid)`
+          claimed = true
+        }
+      } catch {}
+    }
     const out = NextResponse.json({
       output: (typeof data.output === 'string' && data.output) || FALLBACK,
       provisioned: data.provisioned ?? null,
       stage: data.stage ?? 'conversando',
       turns: data.turns ?? 0,
+      claimed,
     })
     if (setHumanCookie) out.cookies.set(HUMAN_COOKIE, makeHumanCookie(), HUMAN_COOKIE_OPTS)
     return out
