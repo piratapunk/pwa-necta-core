@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { createAuthClient } from '@/lib/auth/server'
+import { dropLiveLink } from '@/lib/auth/link-cache'
 import { getSql } from '@/lib/db'
 import { clientIp, hasAllowedOrigin, rateLimit } from '@/lib/security'
 
@@ -43,6 +44,9 @@ export async function POST(req: NextRequest) {
   if (error || !data.user) {
     return NextResponse.json({ error: 'expired' }, { status: 401 })
   }
+
+  /* enlace canjeado: el token ya murió, que un reenvío no lo recicle */
+  if (data.user.email) dropLiveLink(data.user.email.trim().toLowerCase())
 
   /* claim: liga los bots de la sesión del constructor al usuario */
   const sql = getSql()

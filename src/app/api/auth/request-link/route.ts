@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { getAppOrigin } from '@/lib/auth/server'
+import { getLiveLink, setLiveLink, dropLiveLink } from '@/lib/auth/link-cache'
 import { generateMagicLink, sendMagicLinkEmail } from '@/lib/auth/magic-link'
 import { clientIp, hasAllowedOrigin, rateLimit } from '@/lib/security'
 
@@ -37,21 +38,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }
 
-  const link = await generateMagicLink(email)
-  /* respuesta uniforme contra enumeración de cuentas */
-  if (!link) {
-    return NextResponse.json({ ok: true })
+  let urlStr = getLiveLink(email)
+  if (!urlStr) {
+    const link = await generateMagicLink(email)
+    /* respuesta uniforme contra enumeración de cuentas */
+    if (!link) {
+      return NextResponse.json({ ok: true })
+    }
+    const origin = await getAppOrigin()
+    /* página de confirmación (verifica por POST): a prueba del prefetch del correo */
+    const url = new URL(`${origin}/entrar/confirmar`)
+    url.searchParams.set('token_hash', link.token_hash)
+    url.searchParams.set('type', link.type)
+    if (body.builderSessionId) url.searchParams.set('bs', body.builderSessionId)
+    urlStr = url.toString()
+    setLiveLink(email, urlStr)
   }
 
-  const origin = await getAppOrigin()
-  /* página de confirmación (verifica por POST): a prueba del prefetch del correo */
-  const url = new URL(`${origin}/entrar/confirmar`)
-  url.searchParams.set('token_hash', link.token_hash)
-  url.searchParams.set('type', link.type)
-  if (body.builderSessionId) url.searchParams.set('bs', body.builderSessionId)
-
-  const sent = await sendMagicLinkEmail(email, url.toString())
+  const sent = await sendMagicLinkEmail(email, urlStr)
   if (!sent) {
+    /* que un fallo de envío no deje el correo "pegado" a un enlace no entregado */
+    dropLiveLink(email)
     return NextResponse.json({ error: 'email_unavailable' }, { status: 503 })
   }
   return NextResponse.json({ ok: true })
