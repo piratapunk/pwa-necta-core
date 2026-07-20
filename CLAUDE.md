@@ -78,6 +78,15 @@ schema in `PGRST_DB_SCHEMAS`. LLM via the brain: Gemini `gemini-piratapunk` for 
 Ollama for embeddings only. Implementation order is in `docs/ROADMAP.md` (Fase 0 → `bot_spec`
 contract → wizard → quarantine → provisioning).
 
+**Auth (branded magic link).** Identity is the shared house GoTrue; its email templates carry
+another brand's name, so Abi mails its **own** Resend email (`src/lib/auth/magic-link.ts`). Load
+link is admin `generate_link` → link to `/entrar/confirmar` → **POST** verify on mount (beats
+email prefetchers). Gotcha that broke a real prospect: GoTrue keeps **one token per type per
+user**, so every `generate_link` invalidates the link in previously-sent emails — a resend makes
+older emails read *"expired"* instantly. Fixed by caching+re-sending the same link per email
+(`src/lib/auth/link-cache.ts`, evicted on verify). Do **not** "fix" this by shortening/altering
+token expiry — `GOTRUE_MAILER_OTP_EXP` defaults to 24h and was never the problem.
+
 ## Doc map
 
 | File | Content |
