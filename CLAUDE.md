@@ -101,3 +101,10 @@ token expiry — `GOTRUE_MAILER_OTP_EXP` defaults to 24h and was never the probl
 | `brand/` | Brand system: identity, personality, voice/copy, visual language (bee/honeycomb) |
 
 Docs and brand content are written in Spanish — keep new/edited content in Spanish to match.
+
+## Aislamiento de Auth/BD (ADR 007) — LEER antes de tocar auth o Supabase
+- **Estado: abi es el PILOTO (P2)** de la migración de aislamiento. Hoy corre sobre el Supabase **compartido** (`supabase.piratapunk.com`), esquema `abi`, con el pool `auth.users`/GoTrue compartido con todos los proyectos.
+- **Plan:** abi obtiene su **instancia Supabase dedicada** (su propio `auth.users`/BD/llaves) en un **VPS de producción nuevo** (`contabo-prod-01`). Es el piloto que valida el pipeline antes de migrar bjj. Está casi vacío (3 tenants, 3 `tenant_users`) → migración trivial, pero se hace la copia de auth completa igual.
+- **Env que se repunta** en el cutover (Coolify): `ABI_SUPABASE_URL` → `https://db-abi.piratapunk.com`, `ABI_SUPABASE_ANON_KEY`, `ABI_SUPABASE_SERVICE_ROLE_KEY`, `ABI_DATABASE_URL`, `ABI_DB_PASSWORD`. Conjunto de usuarios a migrar = `abi.tenant_users.user_id ∪ abi.feature_requests.user_id`. Reusar el mismo Google client id por instancia (para que `sub` siga válido).
+- Estándar de la flota: `vps-contabo-core/docs/decisions/007-supabase-instance-per-production-project.md`
+- Plan de migración: `vps-contabo-core/docs/plans/2026-07-supabase-prod-isolation-migration.md`
