@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const rows = await sql`
-      select abi.create_feature_request(
+      select necta.create_feature_request(
         ${userId}::uuid, ${body.slug}, ${body.title}, ${body.detail}
       ) as r
     `
